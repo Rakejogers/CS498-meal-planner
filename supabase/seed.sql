@@ -1,0 +1,3 @@
+-- Local development seed data. Runs after migrations on `npm run db:reset`.
+-- Sign-ups are confirmed instantly locally, so creating an account in the app
+-- is usually the quickest way to get a test user.

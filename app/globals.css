@@ -1,0 +1,131 @@
+@import "tailwindcss";
+
+/*
+ * Plenly design tokens. Semantic names follow shadcn/ui conventions so
+ * components added with `npx shadcn add` pick up the brand automatically.
+ */
+:root {
+  --background: #fbf8f3;
+  --foreground: #1c2920;
+  --card: #ffffff;
+  --card-foreground: #1c2920;
+  --popover: #ffffff;
+  --popover-foreground: #1c2920;
+  --primary: #2f5d3a;
+  --primary-foreground: #fbf8f3;
+  --secondary: #f1ebe0;
+  --secondary-foreground: #1c2920;
+  --muted: #f4efe7;
+  --muted-foreground: #6a6f66;
+  --accent: #e6efe1;
+  --accent-foreground: #1c2920;
+  --destructive: #c2410c;
+  --border: #ebe3d6;
+  --input: #e1d8c9;
+  --ring: #2f5d3a;
+  --radius: 0.875rem;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --font-sans: var(--font-geist-sans);
+  --font-display: var(--font-fraunces);
+}
+
+/* Food palette: a soft background and a readable "ink" for each tone. */
+@theme {
+  --color-tomato: #e4572e;
+  --color-tomato-soft: #fde6dc;
+  --color-tomato-ink: #b8401c;
+  --color-saffron: #f2a93b;
+  --color-saffron-soft: #fcefd3;
+  --color-saffron-ink: #a4670f;
+  --color-sage: #5b8a5f;
+  --color-sage-soft: #e2eedd;
+  --color-sage-ink: #37633f;
+  --color-plum: #9b4d6e;
+  --color-plum-soft: #f5e2ea;
+  --color-plum-ink: #843a5a;
+  --color-sky: #3f7ea6;
+  --color-sky-soft: #deedf5;
+  --color-sky-ink: #2c6588;
+
+  --animate-fade-up: fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-float: float 6s ease-in-out infinite;
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-6px);
+    }
+  }
+}
+
+@layer base {
+  *,
+  ::after,
+  ::before {
+    border-color: var(--color-border);
+  }
+
+  html {
+    color-scheme: light;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+    font-feature-settings: "ss01", "cv11";
+  }
+
+  .font-display {
+    font-variation-settings: "SOFT" 60;
+    letter-spacing: -0.02em;
+  }
+
+  ::selection {
+    background-color: var(--color-saffron-soft);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::after,
+  ::before {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
