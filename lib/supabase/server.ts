@@ -2,12 +2,14 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import type { Database } from "./database.types";
 import { supabaseKey, supabaseUrl } from "./env";
+import { supabaseFetch } from "./fetch";
 
 /** Supabase client for Server Components, Server Actions, and Route Handlers. */
 export async function createClient() {
   const cookieStore = await cookies();
 
   return createServerClient<Database>(supabaseUrl, supabaseKey, {
+    global: { fetch: supabaseFetch },
     cookies: {
       getAll() {
         return cookieStore.getAll();

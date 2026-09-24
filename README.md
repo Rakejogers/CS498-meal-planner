@@ -105,5 +105,4 @@ npm run db:types                        # refresh TypeScript types
 ## Troubleshooting
 
 - **`Missing Supabase env vars`**: run `npm run db:start`, then `npm run env:local`, then restart `npm run dev`.
-- **`JWT issued at future`**: the Docker VM clock drifted, which usually happens after the laptop sleeps. Reload the page. If it keeps happening, restart Docker Desktop.
 - **Signed out after `db:reset`**: expected. The reset deletes all users, so create the account again.
