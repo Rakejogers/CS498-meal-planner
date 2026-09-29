@@ -1,0 +1,76 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# Read-only token: nothing in these jobs needs to write to the repo.
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Lint, types, unit tests, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      # Placeholders so the build can run. This job never talks to Supabase.
+      NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:58321
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_ci_placeholder
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run format:check
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+
+  e2e:
+    name: Database and end-to-end tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - uses: supabase/setup-cli@v3
+        with:
+          # Pinned so a new CLI release can't break CI on its own. Bump it
+          # together with your local CLI (`supabase --version`).
+          version: 2.114.0
+      - run: npm ci
+
+      - name: Start Supabase (only the services the app uses)
+        run: supabase start -x studio,imgproxy,realtime,storage-api,edge-runtime,logflare,vector,supavisor
+      - name: Database tests (RLS)
+        run: npm run test:db
+      - name: Generated types match the migrations
+        run: |
+          npm run db:types
+          git diff --exit-code lib/supabase/database.types.ts \
+            || (echo "Run npm run db:types and commit lib/supabase/database.types.ts" && exit 1)
+
+      - run: npm run env:local
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - name: End-to-end tests
+        run: npm run test:e2e
+
+      - uses: actions/upload-artifact@v7
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7

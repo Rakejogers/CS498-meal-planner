@@ -1,0 +1,33 @@
+# Documentation, static assets, and local tooling metadata
+**/*.md
+docs/
+public/
+.agents/
+.codex/
+.vscode/
+
+# Dependencies and generated files
+node_modules/
+.yarn/
+.pnp.*
+lib/supabase/database.types.ts
+next-env.d.ts
+package-lock.json
+*.tsbuildinfo
+supabase/.temp/
+supabase/.branches/
+.husky/_/
+
+# Build output, caches, and test reports
+.next/
+out/
+build/
+dist/
+.cache/
+.turbo/
+.vercel/
+coverage/
+playwright-report/
+test-results/
+blob-report/
+playwright/.cache/
