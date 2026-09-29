@@ -13,8 +13,6 @@ This is the foundation everything else builds on:
 - An empty signed-in page (`/dashboard`) inside the app shell
 - Tests at every level (unit, component, database, end-to-end) and CI that runs them on every PR
 
-A fuller prototype (onboarding, household dashboard) was built first and set aside. [docs/slice-1-reference.md](docs/slice-1-reference.md) describes it and shows how to pull pieces back from git.
-
 ## Stack
 
 - [Next.js 16](https://nextjs.org) (App Router, Server Actions, Turbopack) + TypeScript
@@ -22,6 +20,8 @@ A fuller prototype (onboarding, household dashboard) was built first and set asi
 - [Supabase](https://supabase.com): Postgres, Auth, and Row Level Security, running locally in Docker
 - `zod` for validation, `lucide-react` for icons
 - Vitest + Testing Library, Playwright, and pgTAP for tests. ESLint + Prettier for code style.
+
+
 
 ## Getting started
 
@@ -39,23 +39,26 @@ npx playwright install chromium    # once, for end-to-end tests
 npm run dev                        # http://localhost:3000
 ```
 
-Create an account at http://localhost:3000/login?mode=signup. Local accounts are confirmed instantly.
+Create an account at [http://localhost:3000/login?mode=signup](http://localhost:3000/login?mode=signup). Local accounts are confirmed instantly.
 
 **Editor:** VS Code will offer the recommended extensions (ESLint, Prettier, Tailwind, Vitest, Playwright). Format-on-save is already configured in `.vscode/settings.json`.
 
 ### Local services
 
+
 | Service                    | URL                                                       |
 | -------------------------- | --------------------------------------------------------- |
-| App                        | http://localhost:3000                                     |
-| Supabase Studio (DB admin) | http://127.0.0.1:58323                                    |
-| Mailpit (local emails)     | http://127.0.0.1:58324                                    |
-| Supabase API               | http://127.0.0.1:58321                                    |
+| App                        | [http://localhost:3000](http://localhost:3000)            |
+| Supabase Studio (DB admin) | [http://127.0.0.1:58323](http://127.0.0.1:58323)          |
+| Mailpit (local emails)     | [http://127.0.0.1:58324](http://127.0.0.1:58324)          |
+| Supabase API               | [http://127.0.0.1:58321](http://127.0.0.1:58321)          |
 | Postgres                   | `postgresql://postgres:postgres@127.0.0.1:58322/postgres` |
+
 
 Supabase runs on the 583xx ports instead of the default 543xx, so it can sit alongside other local Supabase projects.
 
 ## Scripts
+
 
 | Script               | What it does                                                        |
 | -------------------- | ------------------------------------------------------------------- |
@@ -74,6 +77,7 @@ Supabase runs on the 583xx ports instead of the default 543xx, so it can sit alo
 | `npm run db:reset`   | Rebuild the local DB from migrations + `seed.sql` (wipes data)      |
 | `npm run db:types`   | Regenerate `lib/supabase/database.types.ts`                         |
 | `npm run env:local`  | Write `.env.local` from the running stack                           |
+
 
 A pre-commit hook (husky + lint-staged) formats and lints the files you commit.
 
@@ -118,6 +122,8 @@ npm run db:types                        # refresh TypeScript types
 npm run test:db                         # check the policies
 ```
 
+
+
 ## CI
 
 GitHub Actions (`.github/workflows/ci.yml`) runs on every pull request and on pushes to `main`:
@@ -125,8 +131,11 @@ GitHub Actions (`.github/workflows/ci.yml`) runs on every pull request and on pu
 1. **Checks:** lint, format, typecheck, unit tests, build
 2. **Database + E2E:** starts Supabase, runs the pgTAP tests, builds the app, and runs Playwright. If it fails, the Playwright report is attached to the run.
 
+
+
 ## Troubleshooting
 
-- **`Missing Supabase env vars`**: run `npm run db:start`, then `npm run env:local`, then restart `npm run dev`.
-- **Signed out after `db:reset`**: expected. The reset deletes all users, so create the account again.
+- `Missing Supabase env vars`: run `npm run db:start`, then `npm run env:local`, then restart `npm run dev`.
+- **Signed out after** `db:reset`: expected. The reset deletes all users, so create the account again.
 - **E2E tests can't connect**: make sure Supabase is running (`npm run db:start`). Playwright reuses your dev server on port 3000 if it's up, and starts one if it isn't.
+
