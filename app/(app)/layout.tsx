@@ -1,38 +1,19 @@
 import { LogOut } from "lucide-react";
 import { Logo } from "@/components/logo";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { getHousehold } from "@/lib/data";
+import { APP_HOME } from "@/lib/auth";
+import { getProfile } from "@/lib/data";
 
-const UPCOMING_SECTIONS = ["Meal plan", "Kitchen", "Groceries"];
-
-export default async function DashboardLayout({ children }: LayoutProps<"/dashboard">) {
-  const { profile, email } = await getHousehold();
-  const name = profile.display_name || email;
+// Shell for every signed-in page. Add new app pages inside app/(app)/.
+export default async function AppLayout({ children }: LayoutProps<"/">) {
+  const { displayName, email } = await getProfile();
+  const name = displayName || email;
 
   return (
     <div className="flex min-h-dvh flex-col">
       <header className="sticky top-0 z-30 border-b bg-background/85 backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-6xl items-center gap-8 px-6">
-          <Logo href="/dashboard" />
-          <nav aria-label="Main" className="hidden items-center gap-1 text-sm md:flex">
-            <span aria-current="page" className="rounded-full bg-secondary px-4 py-2 font-medium">
-              Overview
-            </span>
-            {UPCOMING_SECTIONS.map((label) => (
-              <span
-                key={label}
-                aria-disabled
-                title="Coming soon"
-                className="flex cursor-default items-center gap-2 rounded-full px-4 py-2 text-muted-foreground/80"
-              >
-                {label}
-              </span>
-            ))}
-            <Badge tone="saffron" className="ml-1">
-              Soon
-            </Badge>
-          </nav>
+          <Logo href={APP_HOME} />
 
           <div className="ml-auto flex items-center gap-2">
             <span className="hidden items-center gap-2.5 sm:flex">

@@ -30,5 +30,27 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules",
+    ".yarn",
+    "docs",
+    "public",
+    ".agents",
+    ".codex",
+    ".vscode",
+    ".husky/_",
+    "supabase/.temp",
+    "supabase/.branches",
+    "out",
+    "build",
+    "dist",
+    ".cache",
+    ".turbo",
+    ".vercel",
+    "coverage",
+    "playwright-report",
+    "test-results",
+    "blob-report",
+    "playwright/.cache"
+  ]
 }

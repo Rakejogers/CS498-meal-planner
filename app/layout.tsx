@@ -16,11 +16,11 @@ const fraunces = Fraunces({
 
 export const metadata: Metadata = {
   title: {
-    default: "Plenly · Dinner, sorted for the week",
-    template: "%s · Plenly",
+    default: "Plantry · Dinner, sorted for the week",
+    template: "%s · Plantry",
   },
   description:
-    "Plenly plans a week of dinners around what you like and what's already in your kitchen, then turns it into one tidy grocery list.",
+    "Plantry plans a week of dinners around what you like and what's already in your kitchen, then turns it into one tidy grocery list.",
 };
 
 export const viewport: Viewport = {
@@ -29,10 +29,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html
-      lang="en"
-      className={`${geist.variable} ${fraunces.variable} h-full antialiased`}
-    >
+    <html lang="en" className={`${geist.variable} ${fraunces.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">{children}</body>
     </html>
   );

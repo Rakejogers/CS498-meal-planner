@@ -7,13 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { signIn, signUp, type AuthFormState } from "./actions";
 
-export function AuthForm({
-  mode,
-  next,
-}: {
-  mode: "signin" | "signup";
-  next?: string;
-}) {
+export function AuthForm({ mode, next }: { mode: "signin" | "signup"; next?: string }) {
   const [state, formAction, pending] = useActionState<AuthFormState, FormData>(
     mode === "signup" ? signUp : signIn,
     {},
@@ -87,10 +81,7 @@ export function AuthForm({
       </div>
 
       {state.error && (
-        <p
-          role="alert"
-          className="rounded-2xl bg-tomato-soft px-4 py-3 text-sm text-tomato-ink"
-        >
+        <p role="alert" className="rounded-2xl bg-tomato-soft px-4 py-3 text-sm text-tomato-ink">
           {state.error}
         </p>
       )}

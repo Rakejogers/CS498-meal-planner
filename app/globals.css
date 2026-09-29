@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /*
- * Plenly design tokens. Semantic names follow shadcn/ui conventions so
+ * Plantry design tokens. Semantic names follow shadcn/ui conventions so
  * components added with `npx shadcn add` pick up the brand automatically.
  */
 :root {

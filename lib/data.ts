@@ -3,6 +3,10 @@ import { redirect } from "next/navigation";
 import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 
+// Data access layer: every server-side read of user data goes through here, so
+// the auth check can't be forgotten. Wrap loaders in `cache` so a layout and a
+// page asking for the same thing share one request.
+
 /** The signed-in user's verified JWT claims, or null. */
 export const getUser = cache(async () => {
   const supabase = await createClient();
@@ -10,50 +14,33 @@ export const getUser = cache(async () => {
   return data?.claims ?? null;
 });
 
+/** The signed-in user's claims. Sends signed-out visitors to /login. */
 export async function requireUser() {
   const user = await getUser();
   if (!user) redirect("/login");
   return user;
 }
 
-/** The signed-in user's profile, household, preferences, and pantry. */
-export const getHousehold = cache(async () => {
+/** The signed-in user's profile. */
+export const getProfile = cache(async () => {
   const user = await requireUser();
   const supabase = await createClient();
 
-  const [profile, household] = await Promise.all([
-    supabase
-      .from("profiles")
-      .select("display_name, onboarded_at")
-      .eq("id", user.sub)
-      .maybeSingle(),
-    supabase
-      .from("households")
-      .select(
-        "id, size, dinners_per_week, household_preferences(*), pantry_items(name, state, is_staple, use_soon)",
-      )
-      .eq("owner_id", user.sub)
-      .order("name", { referencedTable: "pantry_items" })
-      .maybeSingle(),
-  ]);
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("display_name")
+    .eq("id", user.sub)
+    .maybeSingle();
 
-  if (profile.error) throw new Error(profile.error.message);
-  if (household.error) throw new Error(household.error.message);
+  if (error) throw new Error(error.message);
 
   // A valid session for a user that no longer exists (e.g. after `db:reset`).
-  if (!profile.data || !household.data?.household_preferences) {
-    redirect("/auth/signout");
-  }
-
-  const { household_preferences, pantry_items, ...rest } = household.data;
+  if (!data) redirect("/auth/signout");
 
   return {
     email: user.email ?? "",
-    profile: profile.data,
-    household: rest,
-    preferences: household_preferences,
-    pantry: pantry_items,
+    displayName: data.display_name,
   };
 });
 
-export type HouseholdData = Awaited<ReturnType<typeof getHousehold>>;
+export type Profile = Awaited<ReturnType<typeof getProfile>>;

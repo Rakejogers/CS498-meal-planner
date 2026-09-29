@@ -17,12 +17,12 @@ const output = execFileSync(
   { encoding: "utf8", stdio: ["ignore", "pipe", "inherit"], shell: process.platform === "win32" },
 );
 
-const lines = output
-  .split(/\r?\n/)
-  .filter((line) => line.startsWith("NEXT_PUBLIC_SUPABASE_"));
+const lines = output.split(/\r?\n/).filter((line) => line.startsWith("NEXT_PUBLIC_SUPABASE_"));
 
 if (lines.length !== 2) {
-  console.error("Couldn't read Supabase status. Is the local stack running? Try `npm run db:start`.");
+  console.error(
+    "Couldn't read Supabase status. Is the local stack running? Try `npm run db:start`.",
+  );
   process.exit(1);
 }
 

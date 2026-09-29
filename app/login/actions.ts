@@ -3,7 +3,7 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { safeNextPath } from "@/lib/auth";
+import { APP_HOME, safeNextPath } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
 export type AuthFormState = {
@@ -26,10 +26,7 @@ const signUpSchema = z.object({
 
 const field = (formData: FormData, key: string) => String(formData.get(key) ?? "");
 
-export async function signIn(
-  _prev: AuthFormState,
-  formData: FormData,
-): Promise<AuthFormState> {
+export async function signIn(_prev: AuthFormState, formData: FormData): Promise<AuthFormState> {
   const email = field(formData, "email").trim();
   const parsed = signInSchema.safeParse({ email, password: field(formData, "password") });
   if (!parsed.success) return { error: parsed.error.issues[0].message, email };
@@ -46,13 +43,10 @@ export async function signIn(
     };
   }
 
-  redirect(safeNextPath(field(formData, "next"), "/dashboard"));
+  redirect(safeNextPath(field(formData, "next"), APP_HOME));
 }
 
-export async function signUp(
-  _prev: AuthFormState,
-  formData: FormData,
-): Promise<AuthFormState> {
+export async function signUp(_prev: AuthFormState, formData: FormData): Promise<AuthFormState> {
   const name = field(formData, "name").trim();
   const email = field(formData, "email").trim();
   const parsed = signUpSchema.safeParse({ name, email, password: field(formData, "password") });
@@ -65,7 +59,7 @@ export async function signUp(
     password: parsed.data.password,
     options: {
       data: { display_name: parsed.data.name },
-      emailRedirectTo: `${origin}/auth/confirm?next=/onboarding`,
+      emailRedirectTo: `${origin}/auth/confirm?next=${APP_HOME}`,
     },
   });
 
@@ -85,5 +79,5 @@ export async function signUp(
     return { notice: `We sent a confirmation link to ${email}.`, name, email };
   }
 
-  redirect("/onboarding");
+  redirect(APP_HOME);
 }

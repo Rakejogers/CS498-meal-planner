@@ -1,4 +1,5 @@
 # Senior Design Product Brief
+
 ## AI-Assisted Meal Planning and Grocery Preparation Platform
 
 > **Working concept:** A web application that plans a user's meals for the week, accounts for food they already have, builds a consolidated grocery list, matches needed ingredients to real grocery products, and helps move those products into a retailer cart.
@@ -380,6 +381,7 @@ The MVP should prove the complete planning-to-grocery workflow rather than maxim
 ### Required
 
 #### User System
+
 - Sign up and sign in.
 - User profile.
 - Household size.
@@ -389,6 +391,7 @@ The MVP should prove the complete planning-to-grocery workflow rather than maxim
 - Meal frequency.
 
 #### Meal Planning
+
 - Generate a weekly dinner plan.
 - Generate approximately 3–5 meals.
 - Swap an individual meal.
@@ -397,6 +400,7 @@ The MVP should prove the complete planning-to-grocery workflow rather than maxim
 - Regenerate suggestions when needed.
 
 #### Recipes
+
 - Structured ingredients.
 - Structured instructions.
 - Cooking time.
@@ -405,12 +409,14 @@ The MVP should prove the complete planning-to-grocery workflow rather than maxim
 - Basic meal feedback.
 
 #### Kitchen
+
 - Pantry and staple records.
 - Have / low / out / unsure states.
 - Natural-language item entry.
 - Kitchen check before grocery planning.
 
 #### Grocery Planning
+
 - Consolidate ingredients across recipes.
 - Normalize units.
 - Calculate required quantities.
@@ -418,6 +424,7 @@ The MVP should prove the complete planning-to-grocery workflow rather than maxim
 - Review the generated grocery list.
 
 #### Retailer Integration
+
 - Kroger authorization.
 - Store selection.
 - Product search.
@@ -735,20 +742,7 @@ These can remain future extensions if the team completes the required system ear
 
 ## 16. Working Brand / Name
 
-The project name is **not finalized** and should not define the product requirements.
-
-**Plenly** can remain a working name during development, but other possibilities could include:
-
-- **Mealflow**
-- **Weekful**
-- **PantryPlan**
-- **Tablewise**
-- **MealPilot**
-- **Gather**
-- **Plantry**
-- **Weekplate**
-
-Any final name should be checked for domain, App Store, trademark, and existing-product conflicts before adoption.
+**Plantry** is the working name agreed upon by the group for development. The name should not define the product requirements.
 
 Regardless of name, the product should feel:
 

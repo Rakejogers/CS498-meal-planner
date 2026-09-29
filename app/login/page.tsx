@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Logo } from "@/components/logo";
-import { WeekPreview } from "@/components/week-preview";
+import { Logo, LogoMark } from "@/components/logo";
 import { cn } from "@/lib/utils";
 import { AuthForm } from "./auth-form";
 
@@ -34,8 +33,8 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
           </h1>
           <p className="mt-2 text-muted-foreground">
             {mode === "signup"
-              ? "Create your account. Setup takes about two minutes."
-              : "Sign in to pick up this week's plan."}
+              ? "Create your account to start planning your week."
+              : "Sign in to pick up where you left off."}
           </p>
 
           <div className="mt-8 grid grid-cols-2 rounded-full bg-secondary p-1 text-sm font-medium">
@@ -60,8 +59,8 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
 
           {confirmFailed && (
             <p className="mt-6 rounded-2xl bg-tomato-soft px-4 py-3 text-sm text-tomato-ink">
-              That confirmation link is invalid or has expired. Try signing in,
-              or create your account again.
+              That confirmation link is invalid or has expired. Try signing in, or create your
+              account again.
             </p>
           )}
 
@@ -69,27 +68,32 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
         </div>
 
         <p className="text-xs text-muted-foreground">
-          Plenly is a student project. Please don&apos;t reuse an important password.
+          Plantry is a student project. Please don&apos;t reuse an important password.
         </p>
       </div>
 
-      <aside className="relative m-3 hidden overflow-hidden rounded-[2rem] bg-primary lg:flex lg:flex-col lg:justify-between lg:p-14">
-        <div className="pointer-events-none absolute -top-32 -right-32 size-[30rem] rounded-full bg-saffron/25 blur-3xl" aria-hidden />
-        <div className="pointer-events-none absolute -bottom-40 -left-20 size-[28rem] rounded-full bg-sage/50 blur-3xl" aria-hidden />
+      <aside className="relative m-3 hidden overflow-hidden rounded-[2rem] bg-primary lg:flex lg:flex-col lg:justify-center lg:p-14">
+        <div
+          className="pointer-events-none absolute -top-32 -right-32 size-[30rem] rounded-full bg-saffron/25 blur-3xl"
+          aria-hidden
+        />
+        <div
+          className="pointer-events-none absolute -bottom-40 -left-20 size-[28rem] rounded-full bg-sage/50 blur-3xl"
+          aria-hidden
+        />
 
         <div className="relative max-w-md">
+          <LogoMark variant="badge" className="mb-8 size-20" />
           <p className="font-display text-5xl leading-[1.05] font-medium text-primary-foreground">
             What&apos;s for dinner?
             <br />
             <em className="font-normal text-saffron italic">Already answered.</em>
           </p>
           <p className="mt-5 text-lg text-primary-foreground/70">
-            A whole week of dinners, planned around your kitchen, in the time it
-            takes to preheat the oven.
+            A whole week of dinners, planned around your kitchen, in the time it takes to preheat
+            the oven.
           </p>
         </div>
-
-        <WeekPreview floating={false} className="relative w-full max-w-md self-end" />
       </aside>
     </div>
   );
