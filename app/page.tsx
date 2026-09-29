@@ -107,7 +107,7 @@ function SiteFooter() {
     <footer className="border-t">
       <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 py-8 text-sm text-muted-foreground sm:flex-row">
         <Logo />
-        <p>A CS498 senior design project · {new Date().getFullYear()}</p>
+        <p>© {new Date().getFullYear()} Plantry</p>
       </div>
     </footer>
   );

@@ -66,10 +66,6 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
 
           <AuthForm key={mode} mode={mode} next={next} />
         </div>
-
-        <p className="text-xs text-muted-foreground">
-          Plantry is a student project. Please don&apos;t reuse an important password.
-        </p>
       </div>
 
       <aside className="relative m-3 hidden overflow-hidden rounded-[2rem] bg-primary lg:flex lg:flex-col lg:justify-center lg:p-14">
