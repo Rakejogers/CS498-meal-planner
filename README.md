@@ -9,7 +9,7 @@ Plantry plans a week of dinners around what a household likes and what's already
 This is the foundation everything else builds on:
 
 - Landing page (`/`)
-- Email + password sign up / sign in (`/login`)
+- Sign in with Google, or email + password (`/login`)
 - A signed-in dashboard (`/dashboard`) that plans a week of dinners around your household and food preferences
 - Tests at every level (unit, component, database, end-to-end) and CI that runs them on every PR
 
@@ -42,6 +42,22 @@ npm run dev                        # http://localhost:3000
 Create an account at [http://localhost:3000/login?mode=signup](http://localhost:3000/login?mode=signup). Local accounts are confirmed instantly.
 
 **Kroger:** store search and the Kroger login need `KROGER_CLIENT_ID`, `KROGER_CLIENT_SECRET`, and `KROGER_REDIRECT_URI` in `.env.local` (see `.env.example`). Get them from the team's app on [developer.kroger.com](https://developer.kroger.com). The redirect URI must match one registered there exactly. Without them, the rest of the app still works.
+
+### Sign in with Google (optional locally)
+
+Email and password works with no setup. To try the Google button locally:
+
+1. In [Google Cloud Console](https://console.cloud.google.com/apis/credentials), create an OAuth client ID (type "Web application") and add `http://127.0.0.1:58321/auth/v1/callback` as an authorized redirect URI.
+2. Put its ID and secret in `supabase/.env` (gitignored):
+
+   ```bash
+   SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID="....apps.googleusercontent.com"
+   SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET="GOCSPX-..."
+   ```
+
+3. Restart Supabase: `npm run db:stop && npm run db:start`.
+
+For the hosted project, enable Google under Authentication → Sign In / Providers in the Supabase dashboard, use `https://<project-ref>.supabase.co/auth/v1/callback` as the redirect URI in Google Cloud, and add `https://<your-domain>/auth/callback` to the allowed redirect URLs.
 
 **Editor:** VS Code will offer the recommended extensions (ESLint, Prettier, Tailwind, Vitest, Playwright). Format-on-save is already configured in `.vscode/settings.json`.
 
@@ -90,6 +106,7 @@ app/
   page.tsx              Landing page
   login/                Sign in / sign up page, form, and server actions
   auth/confirm/         Email-link handler (used when confirmation is on)
+  auth/callback/        Where Google sign-in lands
   auth/signout/         Sign out
   api/kroger/           Kroger login: connect (start) and callback (finish)
   (app)/                Signed-in pages; layout.tsx is the app shell
