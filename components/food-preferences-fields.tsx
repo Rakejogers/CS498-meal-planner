@@ -46,6 +46,10 @@ const FOOD_LISTS = [
   },
 ] as const;
 
+// On a single-page form each question's control sits in a card, like the household size field.
+const CARD =
+  "rounded-3xl border bg-card p-5 shadow-[0_1px_2px_rgba(28,41,32,0.04),0_8px_24px_-12px_rgba(28,41,32,0.08)] sm:p-6";
+
 /**
  * The food preference questions, used by onboarding and settings. Put it
  * inside a <form>; read the submission with `parseFoodPreferencesForm`.
@@ -107,7 +111,7 @@ export function FoodPreferencesFields({
             Pick any that apply to you. Every meal we suggest will follow them.
           </p>
         )}
-        <div className={cn("flex flex-wrap", stepped ? "gap-2.5" : "gap-2")}>
+        <div className={cn("flex flex-wrap", stepped ? "gap-2.5" : cn(CARD, "gap-2"))}>
           {DIETARY_RESTRICTIONS.map(({ value, label }) => {
             const selected = restrictions.includes(value);
             return (
@@ -141,16 +145,18 @@ export function FoodPreferencesFields({
             {label}
           </Label>
           {!stepped && <p className="mt-0.5 mb-4 text-sm text-muted-foreground">{hint}</p>}
-          <TagInput
-            id={key}
-            name={key}
-            values={foods[key]}
-            onAdd={(food) => addFood(key, food)}
-            onRemove={(food) => removeFood(key, food)}
-            suggestions={suggestions}
-            placeholder={placeholder}
-            tone={tone}
-          />
+          <div className={stepped ? undefined : CARD}>
+            <TagInput
+              id={key}
+              name={key}
+              values={foods[key]}
+              onAdd={(food) => addFood(key, food)}
+              onRemove={(food) => removeFood(key, food)}
+              suggestions={suggestions}
+              placeholder={placeholder}
+              tone={tone}
+            />
+          </div>
         </div>
       ))}
     </div>

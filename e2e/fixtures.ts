@@ -25,6 +25,11 @@ export async function signUp(page: Page, user: TestUser) {
   await expect(page).toHaveURL("/dashboard");
 }
 
+export async function signOut(page: Page) {
+  await page.getByRole("button", { name: "Account menu" }).click();
+  await page.getByRole("button", { name: "Sign out" }).click();
+}
+
 export async function signIn(page: Page, user: TestUser) {
   await page.getByLabel("Email").fill(user.email);
   await page.getByLabel("Password", { exact: true }).fill(user.password);

@@ -48,6 +48,12 @@
 
   --font-sans: var(--font-geist-sans);
   --font-display: var(--font-fraunces);
+
+  /*
+   * An ingredient tumbling into the basket and settling. Set --drop-spin for how far it turns
+   * and --drop-delay to stagger. Inline so the delay is read from the element, not the root.
+   */
+  --animate-drop-in: drop-in 0.7s linear var(--drop-delay, 0s) both;
 }
 
 /* Food palette: a soft background and a readable "ink" for each tone. */
@@ -70,9 +76,16 @@
 
   --animate-fade-up: fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
   --animate-float: float 6s ease-in-out infinite;
+  /* First look at a brand screen: slower and softer than fade-up. Stagger with animation-delay. */
+  --animate-rise: rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+  /* Background color washes wandering slowly. */
+  --animate-drift: drift 22s ease-in-out infinite alternate;
   /* Moving between steps of a flow: forward comes from the right, back from the left. */
   --animate-step-forward: step-forward 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
   --animate-step-back: step-back 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+  /* A form field joining or leaving a form, so the fields below slide instead of jumping. */
+  --animate-field-open: field-open 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-field-close: field-close 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
   /* Something just added or selected: a tag, a checkmark. */
   --animate-pop-in: pop-in 0.25s cubic-bezier(0.34, 1.4, 0.64, 1) both;
   /* A stepper value rolling to the next number. */
@@ -83,6 +96,73 @@
     from {
       opacity: 0;
       transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(18px) scale(0.98);
+      filter: blur(6px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+      filter: none;
+    }
+  }
+
+  @keyframes drift {
+    from {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    to {
+      transform: translate3d(6%, -5%, 0) scale(1.12);
+    }
+  }
+
+  @keyframes field-open {
+    from {
+      grid-template-rows: 0fr;
+      opacity: 0;
+    }
+    to {
+      grid-template-rows: 1fr;
+      opacity: 1;
+    }
+  }
+
+  @keyframes field-close {
+    from {
+      grid-template-rows: 1fr;
+      opacity: 1;
+    }
+    to {
+      grid-template-rows: 0fr;
+      opacity: 0;
+    }
+  }
+
+  @keyframes drop-in {
+    from {
+      opacity: 0;
+      transform: translateY(-76px) rotate(var(--drop-spin, 0deg));
+      animation-timing-function: cubic-bezier(0.45, 0, 0.9, 0.6);
+    }
+    18% {
+      opacity: 1;
+    }
+    60% {
+      transform: translateY(5px) rotate(0deg);
+      animation-timing-function: ease-out;
+    }
+    78% {
+      transform: translateY(-4px) rotate(calc(var(--drop-spin, 0deg) * -0.03));
+      animation-timing-function: ease-in-out;
     }
     to {
       opacity: 1;
@@ -189,6 +269,7 @@
   ::after,
   ::before {
     animation-duration: 0.01ms !important;
+    animation-delay: 0s !important;
     animation-iteration-count: 1 !important;
   }
 }
