@@ -1,4 +1,4 @@
-import { expect, newUser, signIn, signUp, test } from "./fixtures";
+import { expect, newUser, signIn, signOut, signUp, test } from "./fixtures";
 
 test("sign up, sign out, and sign back in", async ({ page }) => {
   const user = newUser();
@@ -6,7 +6,7 @@ test("sign up, sign out, and sign back in", async ({ page }) => {
   await signUp(page, user);
   await expect(page.getByRole("heading", { name: `Hi ${user.name}.` })).toBeVisible();
 
-  await page.getByRole("button", { name: "Sign out" }).click();
+  await signOut(page);
   await expect(page).toHaveURL("/login");
 
   await signIn(page, user);
@@ -27,7 +27,7 @@ test("wrong password shows an error", async ({ page }) => {
 test("signed-out visitors are sent to log in, then back", async ({ page }) => {
   const user = newUser();
   await signUp(page, user);
-  await page.getByRole("button", { name: "Sign out" }).click();
+  await signOut(page);
 
   await page.goto("/dashboard");
   await expect(page).toHaveURL("/login?next=%2Fdashboard");

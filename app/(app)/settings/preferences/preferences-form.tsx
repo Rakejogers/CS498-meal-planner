@@ -1,10 +1,9 @@
 "use client";
 
-import { Check, Loader2 } from "lucide-react";
 import { useActionState, useState } from "react";
 import { FoodPreferencesFields } from "@/components/food-preferences-fields";
-import { Button } from "@/components/ui/button";
 import type { FoodPreferences } from "@/lib/preferences";
+import { SaveBar } from "../save-bar";
 import { savePreferences, type PreferencesFormState } from "./actions";
 
 export function PreferencesForm({ initial }: { initial: FoodPreferences }) {
@@ -24,28 +23,14 @@ export function PreferencesForm({ initial }: { initial: FoodPreferences }) {
     >
       <FoodPreferencesFields initial={initial} onChange={() => setEdited(true)} />
 
-      <div className="mt-10 flex flex-wrap items-center gap-4 border-t pt-6">
-        <Button type="submit" size="lg" disabled={pending}>
-          {pending ? <Loader2 className="animate-spin" /> : "Save preferences"}
-        </Button>
-        {state.error && (
-          <p
-            role="alert"
-            className="animate-fade-up rounded-2xl bg-tomato-soft px-4 py-3 text-sm text-tomato-ink"
-          >
-            {state.error}
-          </p>
-        )}
-        {state.saved && !edited && !pending && (
-          <p
-            role="status"
-            className="flex animate-fade-up items-center gap-1.5 text-sm font-medium text-sage-ink"
-          >
-            <Check className="size-4" />
-            Saved. Your next plan will follow these.
-          </p>
-        )}
-      </div>
+      <SaveBar
+        label="Save preferences"
+        savedMessage="Saved. Your next plan will follow these."
+        pending={pending}
+        edited={edited}
+        saved={state.saved}
+        error={state.error}
+      />
     </form>
   );
 }

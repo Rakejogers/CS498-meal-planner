@@ -34,6 +34,7 @@ test("new users set their household and food preferences during onboarding and c
   await page.goto("/onboarding");
   await expect(page).toHaveURL("/dashboard");
 
+  await page.getByRole("button", { name: "Account menu" }).click();
   await page.getByRole("link", { name: "Settings" }).click();
   await expect(page).toHaveURL("/settings/preferences");
   await expect(page.getByRole("button", { name: "Vegetarian" })).toHaveAttribute(

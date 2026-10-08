@@ -1,8 +1,6 @@
-import { LogOut, Settings } from "lucide-react";
-import Link from "next/link";
 import { redirect } from "next/navigation";
+import { AccountMenu } from "@/components/account-menu";
 import { Logo } from "@/components/logo";
-import { Button, buttonVariants } from "@/components/ui/button";
 import { APP_HOME } from "@/lib/auth";
 import { getProfile } from "@/lib/data";
 
@@ -19,30 +17,8 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
         <div className="mx-auto flex h-16 max-w-6xl items-center gap-8 px-6">
           <Logo href={APP_HOME} />
 
-          <div className="ml-auto flex items-center gap-2">
-            <span className="hidden items-center gap-2.5 sm:flex">
-              <span className="grid size-8 place-items-center rounded-full bg-saffron-soft text-sm font-semibold text-saffron-ink uppercase">
-                {name.charAt(0)}
-              </span>
-              <span className="max-w-40 truncate text-sm font-medium">{name}</span>
-            </span>
-            <Link
-              href="/settings"
-              className={buttonVariants({
-                variant: "ghost",
-                size: "sm",
-                className: "text-muted-foreground",
-              })}
-            >
-              <Settings />
-              Settings
-            </Link>
-            <form action="/auth/signout" method="post">
-              <Button type="submit" variant="ghost" size="sm" className="text-muted-foreground">
-                <LogOut />
-                Sign out
-              </Button>
-            </form>
+          <div className="ml-auto">
+            <AccountMenu name={name} email={email} />
           </div>
         </div>
       </header>
