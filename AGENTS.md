@@ -12,7 +12,6 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 - Product brief: `docs/project-overview.md`. Design guide: `docs/design.md`. The UI should feel food-focused, not AI-focused.
 - Conventions (where code goes, testing, security rules): `CONTRIBUTING.md`. Read it before adding a feature.
-- The earlier prototype (onboarding, household dashboard) is summarized in `docs/slice-1-reference.md` and kept in the `slice-1-reference` git tag. Restore pieces from there instead of rewriting them.
 - Signed-in pages go in `app/(app)/`. Every route is private unless it's in `PUBLIC_ROUTES` (`lib/auth.ts`).
 - Server data access goes through `lib/data.ts` and `lib/supabase/server.ts`. Validate server action input with zod.
 - Schema changes go in `supabase/migrations/` (new file per change, always with RLS) with a pgTAP test in `supabase/tests/`. Then run `npm run db:reset`, `npm run db:types`, and `npm run test:db`.
