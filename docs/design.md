@@ -1,8 +1,6 @@
 # Plantry Design System and UI Guide
 
-This document describes the visual language, interface patterns, and product experience for Plantry. It records the current implementation and gives future screens a consistent direction. The product brief in [`project-overview.md`](./project-overview.md) remains the source for product scope; the implemented color and typography tokens live in [`app/globals.css`](../app/globals.css).
-
-> **Implementation status:** The repo was reset to a small foundation: the landing hero, account forms, and an empty signed-in page. Screens marked "implemented" below were built in slice 1. That code (onboarding, household overview, the full landing page, `FoodTile`, `PantryStateBadge`, `WeekPreview`) is kept in the `slice-1-reference` git tag and summarized in [`slice-1-reference.md`](./slice-1-reference.md). Meal generation, recipe detail, pantry editing, grocery planning, and Kroger connection are planned. Examples shown in the marketing preview are illustrative sample data.
+This is Plantry's style guide: the visual language and interface patterns to follow when building any screen. The color and typography tokens live in [`app/globals.css`](../app/globals.css).
 
 ## 1. Product and brand direction
 
@@ -16,17 +14,17 @@ Design around these principles:
 - **Keep the person in control.** Make the plan, grocery list, product matches, and retailer handoff reviewable. Never imply that a product reaches an external cart without approval.
 - **Use plain, encouraging language.** Explain the benefit in everyday cooking terms. Avoid technical AI language, guilt about food waste, or pressure to follow a rigid schedule.
 
-The current working name and wordmark are **Plantry**. The supplied brand pairs a food basket (leaves, tomato, and jar) with a bold, rounded forest-green wordmark and a capital P. Use the transparent color mark and wordmark on light surfaces. Use the cream-on-green badge for compact icons and dark brand panels. Assets live in `public/brand/`; `components/logo.tsx` provides the shared lockup and color/badge mark variants. `app/icon.png` and `app/apple-icon.png` use the green badge for browser tabs and Apple home-screen bookmarks.
+The name and wordmark are **Plantry**. The supplied brand pairs a food basket (leaves, tomato, and jar) with a bold, rounded forest-green wordmark and a capital P. Use the transparent color mark and wordmark on light surfaces. Use the cream-on-green badge for compact icons and dark brand panels. Assets live in `public/brand/`; `components/logo.tsx` provides the shared lockup and color/badge mark variants. `app/icon.png` and `app/apple-icon.png` use the green badge for browser tabs and Apple home-screen bookmarks.
 
 ## 2. Visual language
 
 The interface uses a warm cream canvas, dark green text, white surfaces, soft borders, and a restrained set of food-inspired colors. Large Fraunces headings give the product a friendly editorial character; Geist keeps forms, labels, and dense details clear. Rounded shapes and subtle shadows make the UI approachable without making every section feel like a floating panel.
 
-Use color washes sparingly for decorative hero backgrounds. Use solid token colors for controls, badges, and status. Keep layouts open, with clear section headings and short supporting text. The current product uses Lucide icons and softly tinted icon tiles in place of meal photography; those tiles are illustrative and should not be mistaken for real recipe images.
+Use color washes sparingly for decorative hero backgrounds. Use solid token colors for controls, badges, and status. Keep layouts open, with clear section headings and short supporting text. Use Lucide icons and softly tinted icon tiles in place of meal photography; those tiles are illustrative and should not be mistaken for real recipe images.
 
 ## 3. Color tokens
 
-Hex values below are the current light-theme values from `app/globals.css`. Use semantic tokens for common UI roles so the interface remains consistent if the palette changes.
+Hex values below are the light-theme values from `app/globals.css`. Use semantic tokens for common UI roles so the interface remains consistent if the palette changes.
 
 ### Neutral and semantic colors
 
@@ -55,7 +53,7 @@ Hex values below are the current light-theme values from `app/globals.css`. Use 
 
 Each hue has a saturated base, a pale surface, and a darker ink color. Pair the ink with its matching soft surface for labels and badges. Do not communicate a status through color alone; include a word or another clear indicator.
 
-| Tone    | Base      | Soft surface | Ink       | Current meaning                                               |
+| Tone    | Base      | Soft surface | Ink       | Meaning                                                       |
 | ------- | --------- | ------------ | --------- | ------------------------------------------------------------- |
 | Tomato  | `#E4572E` | `#FDE6DC`    | `#B8401C` | Warm food accent; also the “Out” pantry state and form errors |
 | Saffron | `#F2A93B` | `#FCEFD3`    | `#A4670F` | Highlights, “Running low,” and upcoming states                |
@@ -72,7 +70,7 @@ Each hue has a saturated base, a pale surface, and a darker ink color. Pair the 
 | `out`    | Out         | Tomato  |
 | `unsure` | Unsure      | Plum    |
 
-Slice 1 defined this mapping in `components/pantry-state-badge.tsx` (see the `slice-1-reference` tag). Restore it and reuse it anywhere pantry availability appears.
+This mapping lives in `components/pantry-state-badge.tsx`. Reuse it anywhere pantry availability appears.
 
 ## 4. Typography
 
@@ -82,12 +80,12 @@ Slice 1 defined this mapping in `components/pantry-state-badge.tsx` (see the `sl
 - **Body rendering:** The page uses antialiasing and Geist's `ss01` and `cv11` font features.
 - **Emphasis:** Italic Fraunces is a brand accent for a short phrase, not a default paragraph style. Keep body copy readable and sentence case; reserve uppercase, tracked text for small eyebrows and metadata.
 
-Common implemented sizes include 4xl–5xl page headings, xl card titles, base/large supporting copy, and small labels at 11–14px. Follow the hierarchy already established on the landing, login, onboarding, and dashboard screens instead of adding many one-off sizes.
+Use 4xl–5xl for page headings, xl for card titles, base/large for supporting copy, and 11–14px for small labels. Stay within this hierarchy instead of adding one-off sizes.
 
 ## 5. Shape, spacing, depth, and iconography
 
 - **Base radius:** `--radius: 0.875rem`. Components use larger radii for larger surfaces: rounded-xl inputs, rounded-2xl controls and inner panels, rounded-3xl cards, and pill-shaped buttons and badges.
-- **Content width:** Marketing and signed-in pages use a `max-w-6xl` content area. Onboarding uses `max-w-3xl`; account forms use `max-w-sm`.
+- **Content width:** Full pages use a `max-w-6xl` content area. Step-by-step flows and long forms use a centered `max-w-3xl` reading width; short standalone forms use `max-w-sm`.
 - **Spacing:** Use the Tailwind spacing scale already in the project. Favor generous separation between major sections and tighter spacing within a control group.
 - **Borders:** Use the warm `border` and `input` tokens. Borders should define structure gently; avoid heavy outlines around every nested element.
 - **Shadows:** Keep elevation subtle. Cards use a faint edge shadow; primary buttons use a restrained green shadow. Reserve larger shadows for the featured week preview or a clearly elevated overlay.
@@ -131,77 +129,28 @@ Sizes are small (36px high), default (44px), large (52px), and icon (40px square
 The product is a responsive web application. Design mobile-first and progressively use the existing Tailwind breakpoints:
 
 - Stack page sections and cards on narrow screens; let chip and badge groups wrap.
-- The marketing hero becomes a single column on small screens and a two-column layout at `lg`. The desktop preview cards are decorative and may be hidden on smaller screens when they would crowd the content.
-- Marketing feature cards move from a single column to two columns at `sm`, then use a three-column composition at `lg`.
-- Onboarding keeps a centered reading width. Progress bars remain visible on mobile while their text labels appear from `sm`; the bottom action bar stays available while progressing through long forms.
-- The account experience stacks on mobile and becomes a form-plus-brand-panel layout at `lg`.
-- The dashboard uses a single column on mobile and a two-thirds/one-third content split at `lg`.
+- Two-column layouts collapse to a single column on small screens and split at `lg`. Decorative elements may be hidden on smaller screens when they would crowd the content.
+- Card grids move from a single column to two columns at `sm`, then three or four at `lg`.
+- Step-by-step flows keep a centered reading width. Keep progress indicators and the primary action visible on mobile while moving through long forms.
 
-Keep page gutters consistent with the current `px-6` pattern. Prevent horizontal scrolling when long recipe names, ingredient tags, or retailer product details are introduced.
+Use `px-6` page gutters. Prevent horizontal scrolling from long recipe names, ingredient tags, or product details.
 
-## 8. Screen and journey design
-
-### Public landing page — implemented
-
-The sticky header carries the logo, in-page links, and login/get-started actions. The hero states the dinner-planning benefit, gives a direct signup or dashboard action, and shows an illustrative weekly plan preview. Follow it with a four-step “How it works” section, feature cards about coordinated meals, approximate pantry tracking, consolidated shopping, and user approval, then a closing call to action and compact project footer.
-
-The preview's sample meals and grocery counts are mock data (`WeekPreview`). Keep this distinction clear if the mockup is reused outside marketing.
-
-### Sign in and account creation — implemented
-
-Use a centered, narrow form on the left and a deep-green brand panel with the week preview on wide screens. On narrow screens, show the form without the large decorative panel. A segmented control switches between sign-in and account creation. Include visible labels, password visibility control, pending state, inline errors, and an inbox-confirmation success state.
-
-### First-time setup — implemented
-
-The onboarding sequence has four steps with progress, a compact brand header, and a persistent bottom action bar:
-
-1. **Household:** Name, number of people, and dinners per week.
-2. **Tastes:** Preferred cuisines, dietary requirements, and ingredients or dishes to avoid.
-3. **Routine:** Weeknight cooking time, cooking confidence, leftovers preference, and budget.
-4. **Kitchen:** Usual staples and ingredients the household would like to use soon.
-
-Use clear, conversational questions. Explain that pantry information can be approximate. Keep back/continue actions predictable, preserve entered values while moving between steps, show saving progress, and surface validation or server errors next to the action area.
-
-### Household overview — implemented, partly a placeholder
-
-The signed-in shell has a sticky header, logo, overview navigation, account name, and sign-out action. The page summarizes the current week, preferences, kitchen staples, ingredients to use soon, weekly planning rhythm, and future store connection. At present, the Meal plan, Kitchen, and Groceries navigation items and planning/store buttons are marked “Coming soon”; dinner slots are placeholders. Keep these limitations apparent until those flows are implemented.
-
-### Weekly plan — planned
-
-The target workflow lets the user review dinners for the week, swap or lock a meal, add or remove a meal, adjust servings, and mark a night as leftovers or eating out. Organize meals by day with the meal name, cook time, servings, and a concise reason it fits (for example, uses an item on hand or shares an ingredient with another dinner). Preserve locked meals during regeneration and make plan approval explicit.
-
-### Kitchen review — planned
-
-Provide a quick list of ingredients that affect the current plan. Let users mark each as Have, Running low, Out, or Unsure. Make uncertain items easy to resolve without turning the flow into inventory bookkeeping. Keep staple management and “use soon” items visible but secondary to the current review.
-
-### Grocery list and retailer handoff — planned
-
-Group consolidated ingredients into an easy-to-scan list, show useful quantities and which meals need each item, and account for items already in the kitchen. Separate ingredient requirements from retailer product matches. Let users inspect and replace product choices before a distinct confirmation action adds approved items to the retailer cart. Send checkout to the retailer; do not imply that Plantry completes retailer checkout.
-
-### Recipe, shopping, and cooking follow-up — planned
-
-Recipe detail should prioritize ingredients, servings, cooking time, and clear numbered instructions. After shopping, let the user confirm what actually came home; after cooking, offer lightweight meal feedback and pantry updates. These actions should be optional and quick.
-
-## 9. Interaction, feedback, and accessibility
+## 8. Interaction, feedback, and accessibility
 
 - Provide visible hover, focus, selected, disabled, pending, success, error, and empty states. A disabled state should not be the only explanation for unavailable functionality.
 - Use the shared green focus ring for keyboard navigation and keep a visible focus indicator on every interactive element.
-- Respect reduced-motion preferences. The current theme defines a short fade-up entrance and gentle floating decoration; decorative motion must not carry essential information.
+- Respect reduced-motion preferences. The theme provides a short fade-up entrance (`animate-fade-up`) and a gentle floating decoration (`animate-float`); decorative motion must not carry essential information.
 - Use semantic headings, lists, landmarks, and navigation labels. Keep field labels programmatically associated with their controls. Announce dynamic errors and status changes where appropriate.
 - Do not rely on tone alone for pantry status, selected choices, errors, or progress. Keep the visible label or icon alongside color.
 - Use the darker `*-ink` colors for text on their corresponding soft food-color fills. Check text and control contrast when adding new token combinations; the token list itself is not a contrast audit.
 - Keep controls comfortably tappable. The shared icon button is 40px square; use at least that footprint for compact icon-only actions and provide an accessible name.
 - Avoid layout shifts when loading or saving. Preserve entered data on recoverable errors and explain what the user can do next.
 
-## 10. Design source of truth and update notes
+## 9. Where the design lives
 
 When changing the design, update the shared tokens and components first rather than scattering new colors or styles across pages.
 
 - **Colors, fonts, global radius, animation, base styles:** `app/globals.css`
-- **Font loading and page metadata:** `app/layout.tsx`
+- **Font loading:** `app/layout.tsx`
 - **Shared controls:** `components/ui/`
-- **Brand mark:** `components/logo.tsx` (food tiles and pantry-state badges are in the `slice-1-reference` tag)
-- **Current routes:** `app/page.tsx`, `app/login/`, `app/(app)/` (signed-in pages, starting with `dashboard/`)
-- **Product requirements and intended MVP:** [`project-overview.md`](./project-overview.md)
-
-Keep this guide aligned with both the implementation and the product brief. Mark new flows as planned until their real interaction and state behavior exists in the app.
+- **Brand mark and food components:** `components/logo.tsx`, `components/food-tile.tsx`, `components/pantry-state-badge.tsx`, `components/week-preview.tsx`

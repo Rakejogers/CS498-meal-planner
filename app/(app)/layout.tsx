@@ -1,12 +1,16 @@
-import { LogOut } from "lucide-react";
+import { LogOut, Settings } from "lucide-react";
+import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Logo } from "@/components/logo";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { APP_HOME } from "@/lib/auth";
 import { getProfile } from "@/lib/data";
 
 // Shell for every signed-in page. Add new app pages inside app/(app)/.
 export default async function AppLayout({ children }: LayoutProps<"/">) {
-  const { displayName, email } = await getProfile();
+  const { displayName, email, onboarded } = await getProfile();
+  // New accounts go through first-time setup before they see the app.
+  if (!onboarded) redirect("/onboarding");
   const name = displayName || email;
 
   return (
@@ -22,6 +26,17 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
               </span>
               <span className="max-w-40 truncate text-sm font-medium">{name}</span>
             </span>
+            <Link
+              href="/settings"
+              className={buttonVariants({
+                variant: "ghost",
+                size: "sm",
+                className: "text-muted-foreground",
+              })}
+            >
+              <Settings />
+              Settings
+            </Link>
             <form action="/auth/signout" method="post">
               <Button type="submit" variant="ghost" size="sm" className="text-muted-foreground">
                 <LogOut />

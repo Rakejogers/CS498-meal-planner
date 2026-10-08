@@ -48,14 +48,15 @@ export function Logo({ href = "/", className }: { href?: string; className?: str
       )}
     >
       <LogoMark className="size-7 sm:size-9" />
-      <span aria-hidden="true" className="relative block aspect-[3.3] w-20 overflow-hidden sm:w-28">
+      {/* Box spans cap-top to baseline so the "y" descender hangs below and the letters center on the mark. */}
+      <span aria-hidden="true" className="relative block aspect-[4.33] w-20 sm:w-28">
         <Image
           src="/brand/plantry-wordmark.png"
           alt=""
           width={2172}
           height={724}
           sizes="(min-width: 640px) 128px, 92px"
-          className="absolute -top-[18.8%] -left-[8.9%] w-[114.4%] max-w-none"
+          className="absolute -top-[24.4%] -left-[8.9%] w-[114.4%] max-w-none"
         />
       </span>
     </Link>

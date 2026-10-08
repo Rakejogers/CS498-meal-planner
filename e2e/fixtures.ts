@@ -8,12 +8,20 @@ export function newUser(): TestUser {
   return { name: "Sam", email: `e2e-${id}@example.com`, password: "correct-horse-battery" };
 }
 
-export async function signUp(page: Page, user: TestUser) {
+/** Creates the account and stops at first-time setup, where new users land. */
+export async function createAccount(page: Page, user: TestUser) {
   await page.goto("/login?mode=signup");
   await page.getByLabel("First name").fill(user.name);
   await page.getByLabel("Email").fill(user.email);
   await page.getByLabel("Password", { exact: true }).fill(user.password);
   await page.getByRole("button", { name: "Create account" }).click();
+  await expect(page).toHaveURL("/onboarding");
+}
+
+/** Creates the account and skips first-time setup, ending on the dashboard. */
+export async function signUp(page: Page, user: TestUser) {
+  await createAccount(page, user);
+  await page.getByRole("button", { name: "Skip for now" }).click();
   await expect(page).toHaveURL("/dashboard");
 }
 
