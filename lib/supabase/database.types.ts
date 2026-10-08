@@ -34,23 +34,56 @@ export type Database = {
   }
   public: {
     Tables: {
+      food_preferences: {
+        Row: {
+          cannot_eat: string[]
+          created_at: string
+          dietary_restrictions: string[]
+          dislikes: string[]
+          likes: string[]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cannot_eat?: string[]
+          created_at?: string
+          dietary_restrictions?: string[]
+          dislikes?: string[]
+          likes?: string[]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cannot_eat?: string[]
+          created_at?: string
+          dietary_restrictions?: string[]
+          dislikes?: string[]
+          likes?: string[]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
           display_name: string | null
           id: string
+          onboarded_at: string | null
           updated_at: string
         }
         Insert: {
           created_at?: string
           display_name?: string | null
           id: string
+          onboarded_at?: string | null
           updated_at?: string
         }
         Update: {
           created_at?: string
           display_name?: string | null
           id?: string
+          onboarded_at?: string | null
           updated_at?: string
         }
         Relationships: []

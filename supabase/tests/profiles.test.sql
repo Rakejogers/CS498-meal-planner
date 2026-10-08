@@ -1,6 +1,6 @@
 -- Profiles: sign-up trigger and row level security.
 begin;
-select plan(8);
+select plan(9);
 
 -- Signing up (inserting into auth.users) creates a profile.
 insert into auth.users (id, email, raw_user_meta_data)
@@ -51,6 +51,11 @@ select results_eq(
   'users can rename themselves'
 );
 
+select lives_ok(
+  $$ update public.profiles set onboarded_at = now() $$,
+  'users can finish onboarding'
+);
+
 select is_empty(
   $$ update public.profiles set display_name = 'Mallory'
      where id = '22222222-2222-2222-2222-222222222222' returning id $$,
@@ -61,7 +66,7 @@ select throws_ok(
   $$ update public.profiles set created_at = now() $$,
   '42501',
   null,
-  'users can only edit the display name column'
+  'users cannot edit columns the app doesn''t let them change'
 );
 
 select throws_ok(
