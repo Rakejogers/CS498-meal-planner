@@ -30,7 +30,7 @@ export const getProfile = cache(async () => {
 
   const { data, error } = await supabase
     .from("profiles")
-    .select("display_name, onboarded_at")
+    .select("display_name, onboarded_at, household_size")
     .eq("id", user.sub)
     .maybeSingle();
 
@@ -44,6 +44,8 @@ export const getProfile = cache(async () => {
     displayName: data.display_name,
     /** False until the user finishes (or skips) first-time setup. */
     onboarded: data.onboarded_at !== null,
+    /** How many people they cook for: the default serving count for recipes. */
+    householdSize: data.household_size,
   };
 });
 
@@ -86,6 +88,20 @@ export async function saveFoodPreferences(preferences: FoodPreferences) {
     likes: preferences.likes,
   });
   if (error) console.error("saveFoodPreferences failed:", error.message);
+
+  return { ok: !error };
+}
+
+/** Saves how many people the signed-in user cooks for. */
+export async function saveHouseholdSize(householdSize: number) {
+  const user = await requireUser();
+  const supabase = await createClient();
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({ household_size: householdSize })
+    .eq("id", user.sub);
+  if (error) console.error("saveHouseholdSize failed:", error.message);
 
   return { ok: !error };
 }

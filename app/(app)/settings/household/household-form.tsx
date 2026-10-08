@@ -2,14 +2,13 @@
 
 import { Check, Loader2 } from "lucide-react";
 import { useActionState, useState } from "react";
-import { FoodPreferencesFields } from "@/components/food-preferences-fields";
+import { HouseholdSizeField } from "@/components/household-size-field";
 import { Button } from "@/components/ui/button";
-import type { FoodPreferences } from "@/lib/preferences";
-import { savePreferences, type PreferencesFormState } from "./actions";
+import { saveHousehold, type HouseholdFormState } from "./actions";
 
-export function PreferencesForm({ initial }: { initial: FoodPreferences }) {
-  const [state, formAction, pending] = useActionState<PreferencesFormState, FormData>(
-    savePreferences,
+export function HouseholdForm({ initial }: { initial: number }) {
+  const [state, formAction, pending] = useActionState<HouseholdFormState, FormData>(
+    saveHousehold,
     {},
   );
   // True once something changed since the last save, so "Saved" doesn't linger.
@@ -22,11 +21,11 @@ export function PreferencesForm({ initial }: { initial: FoodPreferences }) {
         formAction(formData);
       }}
     >
-      <FoodPreferencesFields initial={initial} onChange={() => setEdited(true)} />
+      <HouseholdSizeField initial={initial} onChange={() => setEdited(true)} />
 
       <div className="mt-10 flex flex-wrap items-center gap-4 border-t pt-6">
         <Button type="submit" size="lg" disabled={pending}>
-          {pending ? <Loader2 className="animate-spin" /> : "Save preferences"}
+          {pending ? <Loader2 className="animate-spin" /> : "Save household"}
         </Button>
         {state.error && (
           <p
@@ -42,7 +41,7 @@ export function PreferencesForm({ initial }: { initial: FoodPreferences }) {
             className="flex animate-fade-up items-center gap-1.5 text-sm font-medium text-sage-ink"
           >
             <Check className="size-4" />
-            Saved. Your next plan will follow these.
+            Saved. Your next plan will be sized for this.
           </p>
         )}
       </div>

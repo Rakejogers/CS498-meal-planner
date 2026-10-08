@@ -2,7 +2,8 @@
 
 import { redirect } from "next/navigation";
 import { APP_HOME } from "@/lib/auth";
-import { requireUser, saveFoodPreferences } from "@/lib/data";
+import { requireUser, saveFoodPreferences, saveHouseholdSize } from "@/lib/data";
+import { parseHouseholdSizeForm } from "@/lib/household";
 import { parseFoodPreferencesForm } from "@/lib/preferences";
 import { createClient } from "@/lib/supabase/server";
 
@@ -32,11 +33,14 @@ export async function completeOnboarding(
 ): Promise<OnboardingFormState> {
   // "Skip for now" finishes setup without saving any answers.
   if (formData.get("intent") !== "skip") {
-    const parsed = parseFoodPreferencesForm(formData);
-    if (!parsed.success) return { error: parsed.error.issues[0].message };
+    const householdSize = parseHouseholdSizeForm(formData);
+    if (!householdSize.success) return { error: householdSize.error.issues[0].message };
+    const preferences = parseFoodPreferencesForm(formData);
+    if (!preferences.success) return { error: preferences.error.issues[0].message };
 
-    // Preferences first: a retry after a partial failure just saves them again.
-    if (!(await saveFoodPreferences(parsed.data)).ok) return { error: SAVE_FAILED };
+    // Answers first: a retry after a partial failure just saves them again.
+    if (!(await saveHouseholdSize(householdSize.data)).ok) return { error: SAVE_FAILED };
+    if (!(await saveFoodPreferences(preferences.data)).ok) return { error: SAVE_FAILED };
   }
   if (!(await markOnboarded()).ok) return { error: SAVE_FAILED };
 
