@@ -48,6 +48,12 @@
 
   --font-sans: var(--font-geist-sans);
   --font-display: var(--font-fraunces);
+
+  /*
+   * An ingredient tumbling into the basket and settling. Set --drop-spin for how far it turns
+   * and --drop-delay to stagger. Inline so the delay is read from the element, not the root.
+   */
+  --animate-drop-in: drop-in 0.7s linear var(--drop-delay, 0s) both;
 }
 
 /* Food palette: a soft background and a readable "ink" for each tone. */
@@ -138,6 +144,29 @@
     to {
       grid-template-rows: 0fr;
       opacity: 0;
+    }
+  }
+
+  @keyframes drop-in {
+    from {
+      opacity: 0;
+      transform: translateY(-76px) rotate(var(--drop-spin, 0deg));
+      animation-timing-function: cubic-bezier(0.45, 0, 0.9, 0.6);
+    }
+    18% {
+      opacity: 1;
+    }
+    60% {
+      transform: translateY(5px) rotate(0deg);
+      animation-timing-function: ease-out;
+    }
+    78% {
+      transform: translateY(-4px) rotate(calc(var(--drop-spin, 0deg) * -0.03));
+      animation-timing-function: ease-in-out;
+    }
+    to {
+      opacity: 1;
+      transform: none;
     }
   }
 
