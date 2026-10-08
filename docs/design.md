@@ -124,6 +124,18 @@ Sizes are small (36px high), default (44px), large (52px), and icon (40px square
 - Tag inputs show entered items as removable pills, offer quick-add suggestions, and accept Enter or comma as an add action.
 - Use visible selected states, native button behavior, and appropriate `aria-pressed`, `aria-checked`, or radio-group semantics.
 
+### Step-by-step flows
+
+Use a step-by-step flow when a task has several decisions in a fixed order, such as first-time setup or reviewing a plan before it becomes a grocery cart. A settings page that people revisit to change one answer stays a single form.
+
+- **One question per step.** Each step should fit on the screen without scrolling at common phone and laptop sizes. Split a crowded step in two rather than shrinking it.
+- **Same anatomy every step:** a segmented progress bar with "Step n of N", a tone-matched icon tile beside a short label, the question as the Fraunces page heading, one line of supporting copy, then a single control.
+- **Pinned actions.** Back sits on the left and the primary action on the right, in a bar fixed to the bottom of the screen. Only the last step uses the finishing label; the others say "Continue". Optional steps can be continued past while empty.
+- **Motion follows direction.** Steps enter with `animate-step-forward` or `animate-step-back`, the control a beat after its heading, and the progress bar fills as steps complete.
+- **Keep the answers.** Going back never loses what was entered, and focus moves to the new step's heading.
+
+The model is `app/onboarding/onboarding-form.tsx`.
+
 ## 7. Responsive layout
 
 The product is a responsive web application. Design mobile-first and progressively use the existing Tailwind breakpoints:
@@ -139,7 +151,7 @@ Use `px-6` page gutters. Prevent horizontal scrolling from long recipe names, in
 
 - Provide visible hover, focus, selected, disabled, pending, success, error, and empty states. A disabled state should not be the only explanation for unavailable functionality.
 - Use the shared green focus ring for keyboard navigation and keep a visible focus indicator on every interactive element.
-- Respect reduced-motion preferences. The theme provides a short fade-up entrance (`animate-fade-up`) and a gentle floating decoration (`animate-float`); decorative motion must not carry essential information.
+- Respect reduced-motion preferences. The theme provides a short fade-up entrance (`animate-fade-up`), a gentle floating decoration (`animate-float`), a sideways entrance for moving between steps of a flow (`animate-step-forward`, `animate-step-back`), a roll for stepper values (`animate-tick-up`, `animate-tick-down`), and a small pop for something just added or selected (`animate-pop-in`); decorative motion must not carry essential information.
 - Use semantic headings, lists, landmarks, and navigation labels. Keep field labels programmatically associated with their controls. Announce dynamic errors and status changes where appropriate.
 - Do not rely on tone alone for pantry status, selected choices, errors, or progress. Keep the visible label or icon alongside color.
 - Use the darker `*-ink` colors for text on their corresponding soft food-color fills. Check text and control contrast when adding new token combinations; the token list itself is not a contrast audit.

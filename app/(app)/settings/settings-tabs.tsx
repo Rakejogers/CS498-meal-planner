@@ -5,7 +5,10 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 // One entry per settings tab. Each tab is a page at app/(app)/settings/<name>/.
-const TABS = [{ href: "/settings/preferences", label: "Food preferences" }];
+const TABS = [
+  { href: "/settings/preferences", label: "Food preferences" },
+  { href: "/settings/household", label: "Household" },
+];
 
 export function SettingsTabs() {
   const pathname = usePathname();
