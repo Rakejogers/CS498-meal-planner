@@ -14,7 +14,16 @@ const PERSON_TONES = [
   "bg-sky-soft text-sky-ink",
 ];
 
-const SEATS = Array.from({ length: MAX_HOUSEHOLD_SIZE }, (_, index) => index);
+// Bigger households get a "+3" tile after this many, so the row stays one line.
+const MAX_PERSON_TILES = 6;
+
+const SEATS = Array.from({ length: MAX_PERSON_TILES }, (_, index) => index);
+
+const seat =
+  "overflow-hidden transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none";
+const seatShown = "w-10 scale-100 opacity-100 sm:w-12";
+const seatHidden = "w-0 scale-50 opacity-0";
+const tile = "grid size-9 place-items-center rounded-2xl sm:size-10";
 
 const stepButton =
   "grid size-11 cursor-pointer place-items-center rounded-xl text-foreground transition-all outline-none hover:bg-secondary focus-visible:ring-4 focus-visible:ring-ring/20 active:scale-90 disabled:pointer-events-none disabled:opacity-30";
@@ -49,6 +58,8 @@ export function HouseholdSizeField({
     setRising(next > size);
     setSize(next);
   };
+
+  const extra = size - MAX_PERSON_TILES;
 
   return (
     <fieldset>
@@ -98,25 +109,25 @@ export function HouseholdSizeField({
 
           {/* Decorative: the number above already says it. Every seat stays
               mounted so tiles ease in and out instead of popping. */}
-          <div aria-hidden className="flex min-h-10 flex-wrap items-center gap-y-2">
-            {SEATS.map((seat) => (
-              <span
-                key={seat}
-                className={cn(
-                  "overflow-hidden transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none",
-                  seat < size ? "w-12 scale-100 opacity-100" : "w-0 scale-50 opacity-0",
-                )}
-              >
-                <span
-                  className={cn(
-                    "grid size-10 place-items-center rounded-2xl",
-                    PERSON_TONES[seat % PERSON_TONES.length],
-                  )}
-                >
+          <div aria-hidden className="flex min-h-10 items-center">
+            {SEATS.map((index) => (
+              <span key={index} className={cn(seat, index < size ? seatShown : seatHidden)}>
+                <span className={cn(tile, PERSON_TONES[index % PERSON_TONES.length])}>
                   <UserRound className="size-5" />
                 </span>
               </span>
             ))}
+            <span className={cn(seat, extra > 0 ? seatShown : seatHidden)}>
+              <span className={cn(tile, "bg-secondary text-sm font-semibold tabular-nums")}>
+                {/* Holds its last number while easing out, instead of flashing "+0". */}
+                <span
+                  key={extra}
+                  className={cn("block", rising ? "animate-tick-up" : "animate-tick-down")}
+                >
+                  +{Math.max(extra, 1)}
+                </span>
+              </span>
+            </span>
           </div>
         </div>
 
