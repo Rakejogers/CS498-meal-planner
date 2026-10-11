@@ -1,6 +1,6 @@
 -- Profiles: sign-up trigger and row level security.
 begin;
-select plan(9);
+select plan(11);
 
 -- Signing up (inserting into auth.users) creates a profile.
 insert into auth.users (id, email, raw_user_meta_data)
@@ -54,6 +54,19 @@ select results_eq(
 select lives_ok(
   $$ update public.profiles set onboarded_at = now() $$,
   'users can finish onboarding'
+);
+
+select results_eq(
+  $$ update public.profiles set household_size = 4 returning household_size $$,
+  $$ values (4::smallint) $$,
+  'users can set how many people they cook for'
+);
+
+select throws_ok(
+  $$ update public.profiles set household_size = 0 $$,
+  '23514',
+  null,
+  'a household has at least one person'
 );
 
 select is_empty(

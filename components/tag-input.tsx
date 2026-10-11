@@ -60,7 +60,7 @@ export function TagInput({
           <span
             key={value}
             className={cn(
-              "inline-flex items-center gap-1 rounded-full py-1 pr-1 pl-3 text-sm font-medium",
+              "inline-flex animate-pop-in items-center gap-1 rounded-full py-1 pr-1 pl-3 text-sm font-medium",
               tagTones[tone],
             )}
           >
