@@ -1,6 +1,6 @@
 # CS 498 - Initial User Stories
 
-## 1. Set Meal Preferences
+## 1. Set Meal Preferences - COMPLETED
 **Owner: Jake**
 
 As a new user, I want to specify my food preferences and dietary restrictions so that the meals recommended to me fit what I can and want to eat.
@@ -9,14 +9,14 @@ As a new user, I want to specify my food preferences and dietary restrictions so
 1. Given that I am setting up or editing my profile, when I enter foods I like, dislike, or cannot eat, then those preferences are saved to my account.
 2. Given that I have saved dietary restrictions or disliked foods, when a meal plan is generated, then the generated meals should respect those restrictions and preferences.
 
-## 2. Set Household and Serving Size
+## 2. Set Household and Serving Size - COMPLETED
 **Owner: Nate**
 
 As a user, I want to specify how many people I normally cook for so that recipes and grocery quantities are appropriate for my household.
 
 ### Acceptance Criteria
 1. Given that I am editing my profile, when I select my household size, then that value is saved as my default serving count.
-2. Given that my household size is saved, when a recipe is added to my weekly plan, then its ingredient quantities should be scaled to the correct number of servings.
+2. Given that my household size is saved, when a recipe is added to my weekly plan, then its ingredient quantities should be scaled to the correct number of servings. **TBD WHEN MEAL GENERATION IS IMPLEMENTED**
 
 ## 3. Generate a Weekly Meal Plan
 **Owner: Ben**
