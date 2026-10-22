@@ -57,6 +57,8 @@ As a user, I want meal suggestions to consider ingredients that I already have s
 1. Given that I have ingredients marked as available in my pantry, when a weekly meal plan is generated, then those ingredients can be considered when selecting meals.
 2. Given that a meal uses an ingredient I already have, when I view the recipe, then the system should indicate that the ingredient is already available.
 
+**Notes: Add expiration dates, use allrecipes API to generate meals, maximize current ingredience and soon to expire, show estimated cost of meal, optional meal budget or month budget, meal is preferred, create review of recipe that shows in pantry and required purchase, import meals and save under my meals
+
 ## 7. View Recipe Details
 **Owner: Jake**
 
@@ -115,6 +117,8 @@ As a user, I want to send my approved grocery products to my retailer cart so th
 1. Given that I have reviewed my matched grocery products, when I approve the products and choose to add them to my retailer cart, then the application submits the approved products to the retailer.
 2. Given that I removed or rejected a product before submission, when the cart is created, then that product is not submitted.
 3. Given that the products were successfully submitted, when the process is complete, then I can continue to the retailer to review the cart and complete checkout normally.
+
+**Notes: add to cart on kroger, allow replacements of items, notify not in stock, allow removals, if reject ingred allow selection of similar recipe without product or select new, ensure in cart
 
 ## Team Ownership Summary
 
