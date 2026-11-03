@@ -1,6 +1,6 @@
 -- Profiles: sign-up trigger and row level security.
 begin;
-select plan(11);
+select plan(13);
 
 -- Signing up (inserting into auth.users) creates a profile.
 insert into auth.users (id, email, raw_user_meta_data)
@@ -67,6 +67,23 @@ select throws_ok(
   '23514',
   null,
   'a household has at least one person'
+);
+
+select results_eq(
+  $$ update public.profiles
+     set kroger_location_id = '01400943',
+         kroger_store_name = 'Kroger - Forest Park',
+         kroger_store_address = '1212 W Kemper Rd, Cincinnati, OH 45240'
+     returning kroger_location_id $$,
+  $$ values ('01400943') $$,
+  'users can choose their Kroger store'
+);
+
+select throws_ok(
+  $$ update public.profiles set kroger_store_name = null $$,
+  '23514',
+  null,
+  'a store keeps its name and address together with its ID'
 );
 
 select is_empty(
