@@ -1,6 +1,7 @@
 import "server-only";
 import { redirect } from "next/navigation";
 import { cache } from "react";
+import { currentWeekStart, type Ingredient, type Meal } from "@/lib/meal-plan";
 import { knownRestrictions, type FoodPreferences } from "@/lib/preferences";
 import { createClient } from "@/lib/supabase/server";
 
@@ -102,6 +103,72 @@ export async function saveHouseholdSize(householdSize: number) {
     .update({ household_size: householdSize })
     .eq("id", user.sub);
   if (error) console.error("saveHouseholdSize failed:", error.message);
+
+  return { ok: !error };
+}
+
+/**
+ * The plan the signed-in user is cooking from on `today` (YYYY-MM-DD), with its
+ * meals in order: this week's if they have one, otherwise the next one coming
+ * up. Null when they have nothing planned, so finished weeks drop off.
+ */
+export const getMealPlan = cache(async (today: string) => {
+  const user = await requireUser();
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("meal_plans")
+    .select(
+      "id, week_start, planned_meals (id, title, summary, total_minutes, servings, ingredients, steps)",
+    )
+    .eq("user_id", user.sub)
+    .gte("week_start", currentWeekStart(today))
+    .order("week_start")
+    .order("position", { referencedTable: "planned_meals" })
+    .limit(1)
+    .maybeSingle();
+
+  if (error) throw new Error(error.message);
+  if (!data) return null;
+
+  return {
+    id: data.id,
+    weekStart: data.week_start,
+    meals: data.planned_meals.map((meal) => ({
+      id: meal.id,
+      title: meal.title,
+      summary: meal.summary,
+      totalMinutes: meal.total_minutes,
+      servings: meal.servings,
+      // JSON columns: checked against mealSchema before they're saved.
+      ingredients: meal.ingredients as Ingredient[],
+      steps: meal.steps as string[],
+    })),
+  };
+});
+
+export type MealPlan = NonNullable<Awaited<ReturnType<typeof getMealPlan>>>;
+
+/**
+ * Saves the signed-in user's plan for a week, replacing any plan they already
+ * have for it. All or nothing: if it fails, their earlier plan is still there.
+ */
+export async function saveMealPlan(weekStart: string, meals: Meal[]) {
+  await requireUser();
+  const supabase = await createClient();
+
+  const { error } = await supabase.rpc("save_meal_plan", {
+    p_week_start: weekStart,
+    p_meals: meals.map((meal) => ({
+      title: meal.title,
+      summary: meal.summary,
+      total_minutes: meal.totalMinutes,
+      servings: meal.servings,
+      ingredients: meal.ingredients,
+      steps: meal.steps,
+    })),
+  });
+  if (error) console.error("saveMealPlan failed:", error.message);
 
   return { ok: !error };
 }

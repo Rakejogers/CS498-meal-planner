@@ -64,6 +64,80 @@ export type Database = {
         }
         Relationships: []
       }
+      meal_plans: {
+        Row: {
+          created_at: string
+          id: string
+          updated_at: string
+          user_id: string
+          week_start: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+          week_start: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+          week_start?: string
+        }
+        Relationships: []
+      }
+      planned_meals: {
+        Row: {
+          created_at: string
+          id: string
+          ingredients: Json
+          meal_plan_id: string
+          position: number
+          servings: number
+          steps: Json
+          summary: string
+          title: string
+          total_minutes: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          ingredients: Json
+          meal_plan_id: string
+          position: number
+          servings: number
+          steps: Json
+          summary?: string
+          title: string
+          total_minutes: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          ingredients?: Json
+          meal_plan_id?: string
+          position?: number
+          servings?: number
+          steps?: Json
+          summary?: string
+          title?: string
+          total_minutes?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "planned_meals_meal_plan_id_fkey"
+            columns: ["meal_plan_id"]
+            isOneToOne: false
+            referencedRelation: "meal_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
@@ -96,7 +170,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      save_meal_plan: {
+        Args: { p_meals: Json; p_week_start: string }
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never
