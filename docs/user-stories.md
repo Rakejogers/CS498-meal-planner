@@ -24,9 +24,10 @@ As a user, I want to specify how many people I normally cook for so that recipes
 As a user, I want the application to automatically generate several dinners for my upcoming week so that I do not have to decide what to cook from scratch.
 
 ### Acceptance Criteria
-1. Given that I have saved my meal preferences, when I request a new weekly meal plan, then the system generates approximately 3-5 meals.
+1. Given that I have saved my meal preferences, when I request a new weekly meal plan, then the system generates amount of meals based on user preferences.
 2. Given that meals have been generated, when I view my weekly plan, then I can see the name and basic information for each meal.
 3. Given that I have restrictions or preferences saved, when the plan is generated, then the generated meals should take those settings into account.
+4. Use Vercel AI SDK for AI generation on backend
 
 ## 4. Swap an Individual Meal
 **Owner: Colten**

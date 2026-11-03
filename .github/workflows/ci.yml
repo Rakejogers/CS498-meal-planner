@@ -9,9 +9,10 @@ on:
 permissions:
   contents: read
 
+# Cancel superseded PR runs, but never cancel a main run: it may be deploying.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   checks:
@@ -24,6 +25,28 @@ jobs:
       NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_ci_placeholder
     steps:
       - uses: actions/checkout@v7
+        with:
+          # On PRs this is a merge commit; depth 2 brings in main (HEAD^1) to compare against.
+          fetch-depth: 2
+      # Production only applies migrations it hasn't seen, by timestamp. An edited
+      # migration would never reach it, and an older timestamp than main's newest
+      # makes `supabase db push` refuse to deploy.
+      - name: Migrations are append-only and newer than main
+        if: github.event_name == 'pull_request'
+        run: |
+          edited=$(git diff --name-only --diff-filter=MDR HEAD^1 HEAD -- supabase/migrations)
+          if [ -n "$edited" ]; then
+            echo "::error::Migrations already on main can't be edited, renamed, or deleted. Add a new one instead: $edited"
+            exit 1
+          fi
+          latest=$(git ls-tree --name-only HEAD^1 supabase/migrations/ | xargs -n1 basename | cut -d_ -f1 | sort | tail -1)
+          for f in $(git diff --name-only --diff-filter=A HEAD^1 HEAD -- supabase/migrations); do
+            version=$(basename "$f" | cut -d_ -f1)
+            if [ "$version" -le "$latest" ]; then
+              echo "::error file=$f::Timestamp is older than main's newest migration ($latest). Recreate it with \`supabase migration new\`."
+              exit 1
+            fi
+          done
       - uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
@@ -74,3 +97,31 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 7
+
+  deploy-db:
+    # Vercel's Deployment Checks wait on this exact name before the app goes
+    # live, so the schema is always in place first. Rename it in both places.
+    name: Deploy migrations to production
+    # Only after both test jobs pass on main. db push applies just the
+    # migrations production doesn't have yet (no-op otherwise) and never seed.sql.
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [checks, e2e]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # Secrets live in this environment, which only main can use, so a PR branch
+    # can't read the production password.
+    environment: production
+    concurrency:
+      group: deploy-db
+      cancel-in-progress: false
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+      SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: supabase/setup-cli@v3
+        with:
+          version: 2.114.0
+      - run: supabase link --project-ref "$SUPABASE_PROJECT_ID"
+      - run: supabase db push
