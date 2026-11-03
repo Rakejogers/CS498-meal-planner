@@ -36,6 +36,7 @@ Setup is in the [README](README.md). Product brief: [`docs/project-overview.md`]
 2. Every table gets RLS, policies, and explicit grants (template: `supabase/migrations/*_profiles.sql`). CI fails on tables without RLS.
 3. Add a pgTAP test that a user can reach their own rows and no one else's (see `supabase/tests/profiles.test.sql`).
 4. Run `npm run db:reset && npm run db:types && npm run test:db` and commit the regenerated `lib/supabase/database.types.ts`. CI fails if it's stale.
+5. After merge, CI applies new migrations to production once tests pass on `main`. Don't change the production schema by hand (dashboard or SQL editor); it will drift from the migrations.
 
 ## Testing
 
