@@ -18,13 +18,13 @@ As a user, I want to specify how many people I normally cook for so that recipes
 1. Given that I am editing my profile, when I select my household size, then that value is saved as my default serving count.
 2. Given that my household size is saved, when a recipe is added to my weekly plan, then its ingredient quantities should be scaled to the correct number of servings. **TBD WHEN MEAL GENERATION IS IMPLEMENTED**
 
-## 3. Generate a Weekly Meal Plan
+## 3. Generate a Weekly Meal Plan - COMPLETED
 **Owner: Ben**
 
 As a user, I want the application to automatically generate several dinners for my upcoming week so that I do not have to decide what to cook from scratch.
 
 ### Acceptance Criteria
-1. Given that I have saved my meal preferences, when I request a new weekly meal plan, then the system generates amount of meals based on user preferences.
+1. Given that I have saved my meal preferences, when I request a new weekly meal plan, then the system generates amount of meals based on user preferences. **CURRENTLY A FIXED 4 MEALS; TBD WHEN USERS CAN CHOOSE HOW MANY**
 2. Given that meals have been generated, when I view my weekly plan, then I can see the name and basic information for each meal.
 3. Given that I have restrictions or preferences saved, when the plan is generated, then the generated meals should take those settings into account.
 4. Use Vercel AI SDK for AI generation on backend

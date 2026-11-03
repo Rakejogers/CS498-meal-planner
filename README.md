@@ -10,7 +10,7 @@ This is the foundation everything else builds on:
 
 - Landing page (`/`)
 - Email + password sign up / sign in (`/login`)
-- An empty signed-in page (`/dashboard`) inside the app shell
+- A signed-in dashboard (`/dashboard`) that plans a week of dinners around your household and food preferences
 - Tests at every level (unit, component, database, end-to-end) and CI that runs them on every PR
 
 ## Stack
