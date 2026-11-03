@@ -99,6 +99,8 @@ jobs:
           retention-days: 7
 
   deploy-db:
+    # Vercel's Deployment Checks wait on this exact name before the app goes
+    # live, so the schema is always in place first. Rename it in both places.
     name: Deploy migrations to production
     # Only after both test jobs pass on main. db push applies just the
     # migrations production doesn't have yet (no-op otherwise) and never seed.sql.

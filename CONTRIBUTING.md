@@ -37,6 +37,17 @@ Setup is in the [README](README.md). Product brief: [`docs/project-overview.md`]
 3. Add a pgTAP test that a user can reach their own rows and no one else's (see `supabase/tests/profiles.test.sql`).
 4. Run `npm run db:reset && npm run db:types && npm run test:db` and commit the regenerated `lib/supabase/database.types.ts`. CI fails if it's stale.
 5. After merge, CI applies new migrations to production once tests pass on `main`. Don't change the production schema by hand (dashboard or SQL editor); it will drift from the migrations.
+6. Write migrations the live app can survive. The old code keeps running for a few minutes after the migration lands, and a Vercel rollback reverts code but not the database. Add columns as nullable or with a default. To rename or drop something, first merge code that stops using it, then drop it in a later PR.
+
+## Releases
+
+Merging to `main` releases in this order:
+
+1. CI runs lint, unit, database, and end-to-end tests on `main`.
+2. The `Deploy migrations to production` job pushes new migrations to Supabase.
+3. Vercel builds in parallel but holds the deployment until that job passes (Deployment Checks), then puts it live.
+
+If any step fails, the previous version stays live. Fix it with a new PR; don't use Vercel's "Force Promote" unless the failure has nothing to do with the database.
 
 ## Testing
 
