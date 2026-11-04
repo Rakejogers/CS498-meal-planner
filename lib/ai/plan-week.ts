@@ -94,6 +94,10 @@ export const generateMeals: GenerateMeals = async (request) => {
   try {
     const { output } = await generateText({
       model: MODEL,
+      // Planning dinners doesn't need extended thinking: with it off, a week
+      // comes back in about 11s instead of 28s, at under half the cost, with
+      // the same quality in our model comparison.
+      reasoning: "none",
       maxOutputTokens: 16000,
       output: Output.object({ schema: generatedPlanSchema }),
       system: SYSTEM_PROMPT,
