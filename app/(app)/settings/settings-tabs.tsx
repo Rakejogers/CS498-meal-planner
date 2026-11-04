@@ -1,8 +1,9 @@
 "use client";
 
-import { Salad, Store, UsersRound } from "lucide-react";
+import { Salad, Store, UsersRound, Wrench } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { isDev } from "@/lib/dev";
 import { cn } from "@/lib/utils";
 
 // One entry per settings tab. Each tab is a page at app/(app)/settings/<name>/.
@@ -10,6 +11,8 @@ const TABS = [
   { href: "/settings/preferences", label: "Food preferences", icon: Salad },
   { href: "/settings/household", label: "Household", icon: UsersRound },
   { href: "/settings/kroger", label: "Kroger", icon: Store },
+  // Testing tools; only under `next dev`.
+  ...(isDev ? [{ href: "/settings/admin", label: "Admin", icon: Wrench }] : []),
 ];
 
 export function SettingsTabs() {
