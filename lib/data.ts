@@ -1,6 +1,7 @@
 import "server-only";
 import { redirect } from "next/navigation";
 import { cache } from "react";
+import { groceryIngredientsSchema, type GroceryMeal, type GroceryMealInput } from "@/lib/groceries";
 import { knownRestrictions, type FoodPreferences } from "@/lib/preferences";
 import { createClient } from "@/lib/supabase/server";
 
@@ -103,5 +104,72 @@ export async function saveHouseholdSize(householdSize: number) {
     .eq("id", user.sub);
   if (error) console.error("saveHouseholdSize failed:", error.message);
 
+  return { ok: !error };
+}
+
+/** Saved recipe requirements for the signed-in user's current grocery list. */
+export const getGroceryMeals = cache(async (): Promise<GroceryMeal[]> => {
+  const user = await requireUser();
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("grocery_meals")
+    .select("id, title, recipe_servings, planned_servings, included, ingredients")
+    .eq("user_id", user.sub)
+    .order("created_at")
+    .order("id");
+  if (error) throw new Error("We couldn't load your saved meals. Please try again.");
+  return data.map((meal) => ({
+    id: meal.id,
+    title: meal.title,
+    recipeServings: meal.recipe_servings,
+    plannedServings: meal.planned_servings,
+    included: meal.included,
+    ingredients: groceryIngredientsSchema.parse(meal.ingredients),
+  }));
+});
+
+export async function saveGroceryMealEntry(meal: GroceryMealInput, id?: string) {
+  const user = await requireUser();
+  const supabase = await createClient();
+  const values = {
+    title: meal.title,
+    recipe_servings: meal.recipeServings,
+    planned_servings: meal.plannedServings,
+    included: meal.included,
+    ingredients: meal.ingredients,
+  };
+  const query = id
+    ? supabase.from("grocery_meals").update(values).eq("id", id).eq("user_id", user.sub)
+    : supabase.from("grocery_meals").insert({ ...values, user_id: user.sub });
+  const { error } = await query.select("id").single();
+  if (error) console.error("saveGroceryMealEntry failed:", error.message);
+  return { ok: !error };
+}
+
+export async function setGroceryMealIncluded(id: string, included: boolean) {
+  const user = await requireUser();
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("grocery_meals")
+    .update({ included })
+    .eq("id", id)
+    .eq("user_id", user.sub)
+    .select("id")
+    .single();
+  if (error) console.error("setGroceryMealIncluded failed:", error.message);
+  return { ok: !error };
+}
+
+export async function deleteGroceryMealEntry(id: string) {
+  const user = await requireUser();
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("grocery_meals")
+    .delete()
+    .eq("id", id)
+    .eq("user_id", user.sub)
+    .select("id")
+    .single();
+  if (error) console.error("deleteGroceryMealEntry failed:", error.message);
   return { ok: !error };
 }
