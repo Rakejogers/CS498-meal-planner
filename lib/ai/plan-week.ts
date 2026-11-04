@@ -20,6 +20,8 @@ export type PlanRequest = {
   preferences: FoodPreferences;
   /** Meal titles to leave out: ones already planned or being swapped away. */
   avoid?: string[];
+  /** Ingredients already on this week's list, to reuse where they fit. */
+  shopping?: string[];
 };
 
 /** Asks the model for meals. Null when it couldn't produce any. */
@@ -30,24 +32,45 @@ export type PlanResult = { ok: true; meals: Meal[] } | { ok: false };
 const MODEL = "anthropic/claude-haiku-5.5";
 
 // Everything about the user goes in the message.
-const SYSTEM_PROMPT = `You plan weeknight dinners for a home cook.
+const SYSTEM_PROMPT = `You plan a week of dinners for an ordinary home cook: someone making dinner after work, with everyday skills, a regular kitchen, and one trip to a normal supermarket.
 
-Rules:
+What to cook:
 - Plan exactly the number of dinners asked for, each a complete recipe.
+- Pick familiar, crowd-pleasing dinners that people actually make at home: tacos, stir-fries, pasta, sheet-pan chicken, chili, soups, curries, grain bowls, burgers, frittatas, fried rice. Comfort food beats anything fancy.
+- Title dishes the way someone would say them at home ("Chicken and broccoli stir-fry", "Turkey chili"), not like a restaurant menu. No foams, reductions, gastriques, or ingredient lists in the title.
+- Every ingredient is something a regular US supermarket stocks. Skip specialty items like saffron, truffle, fresh lemongrass, gochujang, sumac, or exotic cuts of meat.
+- Keep recipes simple: about 10 ingredients or fewer (not counting salt, pepper, and cooking oil), 4 to 7 short steps, and one or two pots or pans. No deep-frying, no from-scratch stock or pasta, no special equipment.
+- totalMinutes includes prep. Most dinners take 30 to 40 minutes; none take more than an hour.
+- Vary the week: different proteins and styles of dish, so no two dinners feel the same.
+
+Shop once, waste little. Plan the week as one shopping list:
+- Build the week around a few shared fresh ingredients. Most produce, herbs, dairy, and opened packages should show up in at least two dinners, so nothing is bought for a single tablespoon and then thrown out.
+- Use up whole packages across the week: a bunch of cilantro, a bag of spinach, a block of cheddar, a tub of sour cream, a pack of tortillas, a can of coconut milk.
+- A protein can carry two dinners if they taste different, like chicken thighs in tacos early in the week and in fried rice later.
+- Give a shared ingredient the exact same name and unit in every dinner ("yellow onion", "each"), so the grocery list can add them up.
+
+Safety and preferences:
 - Never use a food the cook can't eat, including hidden in sauces, stocks, spice blends, or garnishes. Follow every dietary need.
 - Avoid foods they dislike.
-- Foods they enjoy are a hint about their taste, not a shopping list. Build at most one of the dinners around one of them. Every other dinner should use main ingredients and dishes they haven't mentioned but would probably like.
-- Vary cuisines, proteins, and cooking methods across the week.
-- Where it's natural, share fresh ingredients between dinners (half a bunch of cilantro, the rest of a can of coconut milk) so less goes to waste.
+- Foods they enjoy are a hint about their taste, not a shopping list. Build at most one dinner around one of them; the rest should be dishes they'd probably like but haven't mentioned.
+
+Format:
 - Every recipe serves the number of people given, with quantities for that many servings.
 - Ingredient names are plain grocery items in lowercase, like "yellow onion" or "chicken thighs". Prep goes in the steps, not the name.
 - Quantities are numbers. Units are one of: ${UNITS.join(", ")}. Use "each" for whole items like eggs or lemons.
-- totalMinutes includes prep. Keep most dinners under 45 minutes.
-- The summary is one appetizing sentence about the dish.`;
+- Each ingredient's aisle is where a shopper finds it: produce (fresh fruit, vegetables, fresh herbs), meat-seafood, dairy-eggs (including cheese and butter), bakery (bread, tortillas, buns), pantry (grains, pasta, beans, canned goods, oils, vinegars, sauces, stock, baking supplies), spices (dried herbs, spices, salt, pepper), frozen, or other.
+- Steps are short and plain, written for someone who isn't a trained cook.
+- The summary is one friendly sentence about the dish.`;
 
 const list = (items: string[]) => (items.length ? items.join(", ") : "none");
 
-function describeRequest({ dinners, householdSize, preferences, avoid = [] }: PlanRequest) {
+function describeRequest({
+  dinners,
+  householdSize,
+  preferences,
+  avoid = [],
+  shopping = [],
+}: PlanRequest) {
   const restrictions = DIETARY_RESTRICTIONS.filter((option) =>
     preferences.dietaryRestrictions.includes(option.value),
   ).map((option) => option.label);
@@ -59,6 +82,9 @@ function describeRequest({ dinners, householdSize, preferences, avoid = [] }: Pl
     `Dislikes: ${list(preferences.dislikes)}`,
     `Foods they enjoy (inspiration only): ${list(preferences.likes)}`,
     avoid.length ? `Don't plan any of these again: ${avoid.join("; ")}` : "",
+    shopping.length
+      ? `These dinners join a week already buying: ${shopping.join(", ")}. Reuse those ingredients where they fit.`
+      : "",
   ]
     .filter(Boolean)
     .join("\n");
@@ -104,7 +130,16 @@ export async function planWeek(
 
   add(await generate(request));
   if (meals.length < request.dinners) {
-    add(await generate({ ...request, dinners: request.dinners - meals.length, avoid: [...avoid] }));
+    // The fill-in dinners share the same shopping trip as the ones kept.
+    const shopping = [...new Set(meals.flatMap((meal) => meal.ingredients.map((i) => i.name)))];
+    add(
+      await generate({
+        ...request,
+        dinners: request.dinners - meals.length,
+        avoid: [...avoid],
+        shopping,
+      }),
+    );
   }
 
   if (meals.length < Math.min(request.dinners, MIN_DINNERS_PER_WEEK)) return { ok: false };

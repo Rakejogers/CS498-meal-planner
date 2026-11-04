@@ -1,16 +1,17 @@
 import { z } from "zod";
-import { MAX_HOUSEHOLD_SIZE, MIN_HOUSEHOLD_SIZE } from "@/lib/household";
+import { MAX_HOUSEHOLD_SIZE, MAX_MEALS_PER_WEEK, MIN_HOUSEHOLD_SIZE } from "@/lib/household";
 import { normalizeFood, type DietaryRestriction, type FoodPreferences } from "@/lib/preferences";
 
 // Weekly meal plans: the shape a generated plan must have and the checks it
 // passes before it's saved. The model suggests meals; this file decides which
-// ones are allowed. Quantities stay numbers with a fixed unit so grocery math
-// can add them up later.
+// ones are allowed. Quantities stay numbers with a fixed unit so the grocery
+// list (lib/groceries.ts) can add them up.
 
-/** Dinners to plan until users can choose. */
-export const DEFAULT_DINNERS_PER_WEEK = 4;
+/**
+ * The shortest week we'll save when the model comes back short. Users who ask
+ * for fewer dinners than this get exactly what they asked for.
+ */
 export const MIN_DINNERS_PER_WEEK = 3;
-export const MAX_DINNERS_PER_WEEK = 5;
 export const UNITS = [
   "g",
   "kg",
@@ -31,13 +32,36 @@ export const UNITS = [
 
 export type Unit = (typeof UNITS)[number];
 
+/** Grocery store sections, in the order people usually walk them. */
+export const AISLES = [
+  "produce",
+  "meat-seafood",
+  "dairy-eggs",
+  "bakery",
+  "pantry",
+  "spices",
+  "frozen",
+  "other",
+] as const;
+
+export type Aisle = (typeof AISLES)[number];
+
 // No transforms here: this schema is also sent to the model as the output
 // format, so it has to convert to plain JSON Schema.
 const ingredientSchema = z.object({
   name: z.string().min(1).max(60),
   quantity: z.number().positive(),
   unit: z.enum(UNITS),
+  aisle: z.enum(AISLES),
 });
+
+/**
+ * Ingredients as saved. Plans made before ingredients had an aisle read as
+ * "other" rather than failing to load.
+ */
+export const savedIngredientsSchema = z.array(
+  ingredientSchema.extend({ aisle: z.enum(AISLES).catch("other") }),
+);
 
 export const mealSchema = z.object({
   title: z.string().min(1).max(80),
@@ -51,7 +75,7 @@ export const mealSchema = z.object({
 // What the model returns. It can be asked for fewer meals than a full week
 // (replacements, swaps), so the week's minimum is checked after filtering.
 export const generatedPlanSchema = z.object({
-  meals: z.array(mealSchema).min(1).max(MAX_DINNERS_PER_WEEK),
+  meals: z.array(mealSchema).min(1).max(MAX_MEALS_PER_WEEK),
 });
 
 export type Ingredient = z.infer<typeof ingredientSchema>;
@@ -178,4 +202,13 @@ export function upcomingWeekStart(today: string) {
   // getUTCDay: Sunday is 0. Sunday is 1 day from Monday, Tuesday is 6.
   date.setUTCDate(date.getUTCDate() + ((8 - date.getUTCDay()) % 7));
   return date.toISOString().slice(0, 10);
+}
+
+/** "November 9" for a week starting 2026-11-09. */
+export function formatWeekOf(weekStart: string) {
+  return new Date(`${weekStart}T00:00:00Z`).toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    timeZone: "UTC",
+  });
 }

@@ -9,7 +9,7 @@ const meal = (title: string, ...ingredients: string[]): Meal => ({
   summary: "",
   totalMinutes: 30,
   servings: 2,
-  ingredients: ingredients.map((name) => ({ name, quantity: 1, unit: "each" })),
+  ingredients: ingredients.map((name) => ({ name, quantity: 1, unit: "each", aisle: "other" })),
   steps: ["Cook it."],
 });
 
@@ -23,7 +23,7 @@ const titles = (result: Awaited<ReturnType<typeof planWeek>>) =>
   result.ok ? result.meals.map((m) => m.title) : null;
 
 describe("planWeek", () => {
-  it("replaces a meal that uses a can't-eat food, telling the model to avoid it", async () => {
+  it("replaces a meal that uses a can't-eat food, telling the model to avoid it and reuse the week's ingredients", async () => {
     const generate = vi
       .fn<GenerateMeals>()
       .mockResolvedValueOnce([
@@ -37,7 +37,12 @@ describe("planWeek", () => {
 
     expect(titles(result)).toEqual(["Tacos", "Curry", "Risotto"]);
     expect(generate).toHaveBeenLastCalledWith(
-      expect.objectContaining({ dinners: 1, avoid: ["Tacos", "Curry", "Shrimp scampi"] }),
+      expect.objectContaining({
+        dinners: 1,
+        avoid: ["Tacos", "Curry", "Shrimp scampi"],
+        // The fill-in shares the week's shopping with the dinners kept.
+        shopping: ["tortillas", "chickpeas"],
+      }),
     );
   });
 

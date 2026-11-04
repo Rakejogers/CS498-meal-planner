@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { planWeek } from "@/lib/ai/plan-week";
 import { getFoodPreferences, getMealPlan, getProfile, saveMealPlan } from "@/lib/data";
-import { DEFAULT_DINNERS_PER_WEEK, localDate, upcomingWeekStart } from "@/lib/meal-plan";
+import { localDate, upcomingWeekStart } from "@/lib/meal-plan";
 
 export type PlanFormState = {
   error?: string;
@@ -15,14 +15,14 @@ const PLAN_FAILED = "We couldn't plan your dinners. Please try again.";
 // settings, so the form sends nothing.
 export async function generatePlan(): Promise<PlanFormState> {
   const today = localDate(new Date());
-  const [{ householdSize }, preferences, shownPlan] = await Promise.all([
+  const [{ householdSize, mealsPerWeek }, preferences, shownPlan] = await Promise.all([
     getProfile(),
     getFoodPreferences(),
     getMealPlan(today),
   ]);
 
   const plan = await planWeek({
-    dinners: DEFAULT_DINNERS_PER_WEEK,
+    dinners: mealsPerWeek,
     householdSize,
     preferences,
     // Asking again should bring different dinners, not the same ones.

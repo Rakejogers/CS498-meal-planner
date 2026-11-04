@@ -7,7 +7,7 @@ export const metadata: Metadata = {
 };
 
 export default async function HouseholdSettingsPage() {
-  const { householdSize } = await getProfile();
+  const { householdSize, mealsPerWeek } = await getProfile();
 
-  return <HouseholdForm initial={householdSize} />;
+  return <HouseholdForm initial={{ householdSize, mealsPerWeek }} />;
 }

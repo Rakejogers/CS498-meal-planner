@@ -36,7 +36,7 @@ function summary(size: number) {
 
 /**
  * The household size question, used by onboarding and settings. Put it inside
- * a <form>; read the submission with `parseHouseholdSizeForm`.
+ * a <form>; read the submission with `parseHouseholdForm`.
  */
 export function HouseholdSizeField({
   initial,

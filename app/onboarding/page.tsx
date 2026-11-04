@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 // First-time setup. The signed-in layout sends new accounts here until they
 // finish or skip it; afterwards the same questions live in Settings.
 export default async function OnboardingPage() {
-  const [{ displayName, onboarded, householdSize }, preferences] = await Promise.all([
+  const [{ displayName, onboarded, householdSize, mealsPerWeek }, preferences] = await Promise.all([
     getProfile(),
     getFoodPreferences(),
   ]);
@@ -37,7 +37,7 @@ export default async function OnboardingPage() {
       <main className="mx-auto flex w-full max-w-3xl flex-1 animate-fade-up flex-col px-6 pt-6 sm:pt-10">
         <OnboardingForm
           displayName={displayName}
-          householdSize={householdSize}
+          household={{ householdSize, mealsPerWeek }}
           preferences={preferences}
         />
       </main>

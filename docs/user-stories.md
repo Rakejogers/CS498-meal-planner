@@ -24,7 +24,7 @@ As a user, I want to specify how many people I normally cook for so that recipes
 As a user, I want the application to automatically generate several dinners for my upcoming week so that I do not have to decide what to cook from scratch.
 
 ### Acceptance Criteria
-1. Given that I have saved my meal preferences, when I request a new weekly meal plan, then the system generates amount of meals based on user preferences. **CURRENTLY A FIXED 4 MEALS; TBD WHEN USERS CAN CHOOSE HOW MANY**
+1. Given that I have saved my meal preferences, when I request a new weekly meal plan, then the system generates amount of meals based on user preferences. Users choose 1–7 dinners a week during onboarding or in Settings → Household.
 2. Given that meals have been generated, when I view my weekly plan, then I can see the name and basic information for each meal.
 3. Given that I have restrictions or preferences saved, when the plan is generated, then the generated meals should take those settings into account.
 4. Use Vercel AI SDK for AI generation on backend
@@ -76,9 +76,7 @@ As a user, I want ingredients from all of my planned meals combined into one gro
 2. Given that multiple recipes require the same ingredient, when the grocery list is generated, then the ingredient appears as a combined grocery requirement instead of unnecessary duplicate entries.
 3. Given that ingredient quantities can be combined, when duplicates are merged, then the required quantity should reflect the total needed across the recipes.
 
-**Implemented foundation:** `/groceries` saves manually entered meals to the signed-in user's account, scales recipe quantities to planned servings, and combines ingredients across included meals. Meals can be edited, excluded, or removed, and the resulting list can be copied for shopping.
-
-**Remaining integration:** Read approved meals directly from the weekly meal plan when meal generation and recipe storage are available. Pantry deductions belong to User Story 9. See `docs/grocery-list.md` for the integration contract.
+**Implemented:** `/groceries` combines the ingredients of every dinner in the current weekly plan into one list that can be copied for shopping. Pantry deductions belong to User Story 9. See `docs/grocery-list.md`.
 
 ## 9. Account for Pantry Items in Grocery Planning
 **Owner: Ben**

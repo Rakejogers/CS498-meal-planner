@@ -1,6 +1,6 @@
 import { createAccount, expect, newUser, test } from "./fixtures";
 
-test("new users set their household and food preferences during onboarding and can change them in settings", async ({
+test("new users set their household, dinners per week, and food preferences during onboarding and can change them in settings", async ({
   page,
 }) => {
   const user = newUser();
@@ -13,6 +13,11 @@ test("new users set their household and food preferences during onboarding and c
   // Everyone starts at two; this household is four.
   await page.getByRole("button", { name: "One more person" }).click();
   await page.getByRole("button", { name: "One more person" }).click();
+  await page.getByRole("button", { name: "Continue" }).click();
+
+  // Four dinners a week unless they say otherwise.
+  await expect(page.getByRole("radio", { name: "4 dinners" })).toBeChecked();
+  await page.getByRole("radio", { name: "3 dinners" }).check();
   await page.getByRole("button", { name: "Continue" }).click();
 
   // One question per step after that.
@@ -57,10 +62,13 @@ test("new users set their household and food preferences during onboarding and c
 
   await page.getByRole("link", { name: "Household" }).click();
   await expect(page.getByRole("status")).toContainText("4");
+  await expect(page.getByRole("radio", { name: "3 dinners" })).toBeChecked();
   await page.getByRole("button", { name: "One fewer person" }).click();
+  await page.getByRole("radio", { name: "5 dinners" }).check();
   await page.getByRole("button", { name: "Save household" }).click();
   await expect(page.getByText("Saved.")).toBeVisible();
 
   await page.reload();
   await expect(page.getByRole("status")).toContainText("3");
+  await expect(page.getByRole("radio", { name: "5 dinners" })).toBeChecked();
 });

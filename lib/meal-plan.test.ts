@@ -12,7 +12,7 @@ const meal = (title: string, ...ingredients: string[]): Meal => ({
   summary: "",
   totalMinutes: 30,
   servings: 2,
-  ingredients: ingredients.map((name) => ({ name, quantity: 1, unit: "each" })),
+  ingredients: ingredients.map((name) => ({ name, quantity: 1, unit: "each", aisle: "other" })),
   steps: ["Cook it."],
 });
 

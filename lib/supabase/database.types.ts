@@ -37,20 +37,6 @@ export type Database = {
                   Relationships: [
                     
                   ]
-                },"grocery_meals": {
-                  Row: {
-                    "created_at": string,"id": string,"included": boolean,"ingredients": NonNullable<Json>,"planned_servings": number,"recipe_servings": number,"title": string,"updated_at": string,"user_id": string
-                  }
-                  ComputedFields: never
-                  Insert: {
-                    "created_at"?: string,"id"?: string,"included"?: boolean,"ingredients": NonNullable<Json>,"planned_servings": number,"recipe_servings": number,"title": string,"updated_at"?: string,"user_id": string
-                  }
-                  Update: {
-                    "created_at"?: string,"id"?: string,"included"?: boolean,"ingredients"?: NonNullable<Json>,"planned_servings"?: number,"recipe_servings"?: number,"title"?: string,"updated_at"?: string,"user_id"?: string
-                  }
-                  Relationships: [
-                    
-                  ]
                 },"meal_plans": {
                   Row: {
                     "created_at": string,"id": string,"updated_at": string,"user_id": string,"week_start": string
@@ -87,14 +73,14 @@ isOneToOne: false
                   ]
                 },"profiles": {
                   Row: {
-                    "created_at": string,"display_name": string | null,"household_size": number,"id": string,"kroger_location_id": string | null,"kroger_store_address": string | null,"kroger_store_name": string | null,"onboarded_at": string | null,"updated_at": string
+                    "created_at": string,"display_name": string | null,"household_size": number,"id": string,"kroger_location_id": string | null,"kroger_store_address": string | null,"kroger_store_name": string | null,"meals_per_week": number,"onboarded_at": string | null,"updated_at": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "created_at"?: string,"display_name"?: string | null,"household_size"?: number,"id": string,"kroger_location_id"?: string | null,"kroger_store_address"?: string | null,"kroger_store_name"?: string | null,"onboarded_at"?: string | null,"updated_at"?: string
+                    "created_at"?: string,"display_name"?: string | null,"household_size"?: number,"id": string,"kroger_location_id"?: string | null,"kroger_store_address"?: string | null,"kroger_store_name"?: string | null,"meals_per_week"?: number,"onboarded_at"?: string | null,"updated_at"?: string
                   }
                   Update: {
-                    "created_at"?: string,"display_name"?: string | null,"household_size"?: number,"id"?: string,"kroger_location_id"?: string | null,"kroger_store_address"?: string | null,"kroger_store_name"?: string | null,"onboarded_at"?: string | null,"updated_at"?: string
+                    "created_at"?: string,"display_name"?: string | null,"household_size"?: number,"id"?: string,"kroger_location_id"?: string | null,"kroger_store_address"?: string | null,"kroger_store_name"?: string | null,"meals_per_week"?: number,"onboarded_at"?: string | null,"updated_at"?: string
                   }
                   Relationships: [
                     

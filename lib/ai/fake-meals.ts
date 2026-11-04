@@ -12,8 +12,9 @@ export const fakeMeals: GenerateMeals = async ({ dinners, householdSize, avoid =
     totalMinutes: 30,
     servings: householdSize,
     ingredients: [
-      { name: "rice", quantity: 1, unit: "cup" },
-      { name: "black beans", quantity: 1, unit: "can" },
+      { name: "rice", quantity: 1, unit: "cup", aisle: "pantry" },
+      { name: "black beans", quantity: 1, unit: "can", aisle: "pantry" },
+      { name: "cilantro", quantity: 1, unit: "bunch", aisle: "produce" },
     ],
     steps: ["Cook the rice.", "Warm the beans."],
   }));
