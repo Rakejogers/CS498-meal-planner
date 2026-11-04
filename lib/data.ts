@@ -2,6 +2,7 @@ import "server-only";
 import { redirect } from "next/navigation";
 import { cache } from "react";
 import { groceryIngredientsSchema, type GroceryMeal, type GroceryMealInput } from "@/lib/groceries";
+import type { KrogerStore } from "@/lib/kroger/stores";
 import { knownRestrictions, type FoodPreferences } from "@/lib/preferences";
 import { createClient } from "@/lib/supabase/server";
 
@@ -31,7 +32,9 @@ export const getProfile = cache(async () => {
 
   const { data, error } = await supabase
     .from("profiles")
-    .select("display_name, onboarded_at, household_size")
+    .select(
+      "display_name, onboarded_at, household_size, kroger_location_id, kroger_store_name, kroger_store_address",
+    )
     .eq("id", user.sub)
     .maybeSingle();
 
@@ -47,6 +50,15 @@ export const getProfile = cache(async () => {
     onboarded: data.onboarded_at !== null,
     /** How many people they cook for: the default serving count for recipes. */
     householdSize: data.household_size,
+    /** The Kroger store they shop at, or null until they choose one. */
+    krogerStore:
+      data.kroger_location_id && data.kroger_store_name && data.kroger_store_address
+        ? ({
+            locationId: data.kroger_location_id,
+            name: data.kroger_store_name,
+            address: data.kroger_store_address,
+          } satisfies KrogerStore)
+        : null,
   };
 });
 
@@ -104,6 +116,26 @@ export async function saveHouseholdSize(householdSize: number) {
     .eq("id", user.sub);
   if (error) console.error("saveHouseholdSize failed:", error.message);
 
+  return { ok: !error };
+}
+
+/**
+ * Saves the Kroger store the signed-in user shops at. Pass a store from
+ * `getStore` (lib/kroger/stores.ts), not one built from form input.
+ */
+export async function saveKrogerStore(store: KrogerStore) {
+  const user = await requireUser();
+  const supabase = await createClient();
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({
+      kroger_location_id: store.locationId,
+      kroger_store_name: store.name,
+      kroger_store_address: store.address,
+    })
+    .eq("id", user.sub);
+  if (error) console.error("saveKrogerStore failed:", error.message);
   return { ok: !error };
 }
 

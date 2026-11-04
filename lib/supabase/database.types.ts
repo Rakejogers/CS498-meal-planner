@@ -106,6 +106,9 @@ export type Database = {
           display_name: string | null
           household_size: number
           id: string
+          kroger_location_id: string | null
+          kroger_store_address: string | null
+          kroger_store_name: string | null
           onboarded_at: string | null
           updated_at: string
         }
@@ -114,6 +117,9 @@ export type Database = {
           display_name?: string | null
           household_size?: number
           id: string
+          kroger_location_id?: string | null
+          kroger_store_address?: string | null
+          kroger_store_name?: string | null
           onboarded_at?: string | null
           updated_at?: string
         }
@@ -122,6 +128,9 @@ export type Database = {
           display_name?: string | null
           household_size?: number
           id?: string
+          kroger_location_id?: string | null
+          kroger_store_address?: string | null
+          kroger_store_name?: string | null
           onboarded_at?: string | null
           updated_at?: string
         }
