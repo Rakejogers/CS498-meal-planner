@@ -116,6 +116,9 @@ Unit tests sit next to the code they test (`lib/auth.test.ts`). [CONTRIBUTING.md
 Tables live in `public`. Every table has Row Level Security, and a database test fails if one doesn't.
 
 - `profiles`: one per user (display name), created by a trigger on `auth.users` at sign-up
+- `grocery_meals`: private recipe entries for the current combined grocery list, including original servings, planned servings, ingredient amounts, and whether the meal is included
+
+The signed-in **Groceries** page is available from the main navigation and dashboard. Add meals and their original recipe amounts; the list scales each recipe to the chosen servings and merges compatible requirements. Meal generation can later reuse the calculation in `lib/groceries.ts`; see [`docs/grocery-list.md`](docs/grocery-list.md).
 
 **Changing the schema:**
 

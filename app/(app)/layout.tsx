@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { AccountMenu } from "@/components/account-menu";
+import { AppNav } from "@/components/app-nav";
 import { Logo } from "@/components/logo";
 import { APP_HOME } from "@/lib/auth";
 import { getProfile } from "@/lib/data";
@@ -14,8 +15,9 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
   return (
     <div className="flex min-h-dvh flex-col">
       <header className="sticky top-0 z-30 border-b bg-background/85 backdrop-blur-md">
-        <div className="mx-auto flex h-16 max-w-6xl items-center gap-8 px-6">
+        <div className="mx-auto flex min-h-16 max-w-6xl flex-wrap items-center gap-x-6 gap-y-2 px-6 py-3">
           <Logo href={APP_HOME} />
+          <AppNav />
 
           <div className="ml-auto">
             <AccountMenu name={name} email={email} />
