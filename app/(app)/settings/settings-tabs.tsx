@@ -1,6 +1,6 @@
 "use client";
 
-import { Salad, UsersRound } from "lucide-react";
+import { Salad, Store, UsersRound } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 const TABS = [
   { href: "/settings/preferences", label: "Food preferences", icon: Salad },
   { href: "/settings/household", label: "Household", icon: UsersRound },
+  { href: "/settings/kroger", label: "Kroger", icon: Store },
 ];
 
 export function SettingsTabs() {
