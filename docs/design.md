@@ -121,7 +121,7 @@ Sizes are small (36px high), default (44px), large (52px), and icon (40px square
 - Inputs are 48px high, white, rounded-xl, and use a warm border. Focus strengthens the border and adds a soft green ring; invalid input uses the destructive token.
 - Labels sit above their controls. Supporting hints sit close to the label and explain a choice without repeating it.
 - Steppers use a bordered white group, large Fraunces value, and separately labeled increase/decrease buttons.
-- Tag inputs show entered items as removable pills, offer quick-add suggestions, and accept Enter or comma as an add action.
+- Tag inputs put the text box first, marked with a pencil icon and a "Type any food" placeholder, so it's clear anything can be typed in. Entered items show as removable pills; Enter, comma, or the Add button (shown while typing) adds one. Suggestions sit below under "Or tap to add" as dashed chips that move into the box when tapped. On phones, show only as many suggestions as fit on screen.
 - Use visible selected states, native button behavior, and appropriate `aria-pressed`, `aria-checked`, or radio-group semantics.
 
 ### Step-by-step flows

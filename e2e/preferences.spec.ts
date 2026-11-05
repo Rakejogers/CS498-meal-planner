@@ -23,6 +23,9 @@ test("new users set their household, dinners per week, and food preferences duri
   // One question per step after that.
   await page.getByRole("button", { name: "Vegetarian" }).click();
   await page.getByRole("button", { name: "Continue" }).click();
+  // Diets are split over two steps that share one answer; both must be saved.
+  await page.getByRole("button", { name: "Halal" }).click();
+  await page.getByRole("button", { name: "Continue" }).click();
   await page.getByLabel("Foods you can't eat").fill("Peanuts");
   await page.getByLabel("Foods you can't eat").press("Enter");
   await page.getByRole("button", { name: "Continue" }).click();
@@ -46,6 +49,7 @@ test("new users set their household, dinners per week, and food preferences duri
     "aria-pressed",
     "true",
   );
+  await expect(page.getByRole("button", { name: "Halal" })).toHaveAttribute("aria-pressed", "true");
   await expect(page.getByRole("button", { name: "Remove peanuts" })).toBeVisible();
 
   // Changing your mind: a loved food that turns out to be off the table moves lists.

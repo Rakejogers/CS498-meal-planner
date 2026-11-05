@@ -8,6 +8,7 @@ import {
   Heart,
   Loader2,
   Salad,
+  ShieldCheck,
   ThumbsDown,
   UsersRound,
   type LucideIcon,
@@ -55,20 +56,28 @@ const STEPS: Step[] = [
       "We'll plan this many each week and put everything they need on one grocery list. Leave room for leftovers and nights out.",
   },
   {
-    field: "dietaryRestrictions",
+    field: "eatingStyle",
     icon: Salad,
+    tile: "bg-saffron-soft text-saffron-ink",
+    eyebrow: "How you eat",
+    title: "How do you like to eat?",
+    intro: "Pick any styles or goals that fit. We'll shape every meal around them.",
+  },
+  {
+    field: "dietaryNeeds",
+    icon: ShieldCheck,
     tile: "bg-plum-soft text-plum-ink",
     eyebrow: "Dietary needs",
     title: "Any dietary needs?",
-    intro: "Pick any that apply to you. Every meal we suggest will follow them.",
+    intro: "Faith, allergies, or intolerances. Every meal we suggest will follow them.",
   },
   {
     field: "cannotEat",
     icon: Ban,
     tile: "bg-tomato-soft text-tomato-ink",
     eyebrow: "Off the table",
-    title: "Anything you can't eat?",
-    intro: "Allergies and anything that's off limits. We'll never plan a meal with these.",
+    title: "Anything else you can't eat?",
+    intro: "Other allergies or foods that are off limits. We'll never plan a meal with these.",
   },
   {
     field: "dislikes",
@@ -180,7 +189,7 @@ export function OnboardingForm({
         <div hidden={!preferenceStep}>
           <FoodPreferencesFields
             initial={preferences}
-            only={preferenceStep ? field : "dietaryRestrictions"}
+            only={preferenceStep ? field : "eatingStyle"}
             sectionClassName={fieldEntrance}
           />
         </div>

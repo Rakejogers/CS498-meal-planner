@@ -71,9 +71,10 @@ function describeRequest({
   avoid = [],
   shopping = [],
 }: PlanRequest) {
+  // The hint spells out less familiar diets, e.g. "Jain (No meat or root vegetables)".
   const restrictions = DIETARY_RESTRICTIONS.filter((option) =>
     preferences.dietaryRestrictions.includes(option.value),
-  ).map((option) => option.label);
+  ).map((option) => `${option.label} (${option.hint})`);
 
   return [
     `Plan ${dinners} ${dinners === 1 ? "dinner" : "dinners"} for ${householdSize} ${householdSize === 1 ? "person" : "people"}.`,
