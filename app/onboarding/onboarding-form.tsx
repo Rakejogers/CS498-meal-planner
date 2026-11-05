@@ -151,132 +151,136 @@ export function OnboardingForm({
   const planningShown = pending && finishing;
 
   return (
-    <form
-      action={formAction}
-      onSubmit={onSubmit}
-      inert={planningShown}
-      className="flex flex-1 flex-col"
-    >
+    <>
       {planningShown && <PlanningScreen />}
-      <div className="flex items-center gap-4">
-        <p className="text-xs font-semibold tracking-widest text-sage-ink uppercase tabular-nums">
-          Step {step + 1} of {STEPS.length}
-        </p>
-        <div aria-hidden className="flex flex-1 gap-1.5">
-          {STEPS.map(({ field }, index) => (
-            <span key={field} className="h-1.5 flex-1 overflow-hidden rounded-full bg-secondary">
-              <span
-                className={cn(
-                  "block h-full origin-left rounded-full bg-primary transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none",
-                  index <= step ? "scale-x-100" : "scale-x-0",
-                )}
-              />
+      <form
+        action={formAction}
+        onSubmit={onSubmit}
+        inert={planningShown}
+        // The page's entrance lives here, not on <main>: its transform would
+        // pin the fixed planning screen to <main> instead of the viewport.
+        className="flex flex-1 animate-fade-up flex-col"
+      >
+        <div className="flex items-center gap-4">
+          <p className="text-xs font-semibold tracking-widest text-sage-ink uppercase tabular-nums">
+            Step {step + 1} of {STEPS.length}
+          </p>
+          <div aria-hidden className="flex flex-1 gap-1.5">
+            {STEPS.map(({ field }, index) => (
+              <span key={field} className="h-1.5 flex-1 overflow-hidden rounded-full bg-secondary">
+                <span
+                  className={cn(
+                    "block h-full origin-left rounded-full bg-primary transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none",
+                    index <= step ? "scale-x-100" : "scale-x-0",
+                  )}
+                />
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <div key={step} className={cn("mt-6 sm:mt-10", entrance)}>
+          <div className="flex items-center gap-3">
+            <span aria-hidden className={cn("grid size-11 place-items-center rounded-2xl", tile)}>
+              <Icon className="size-5" />
             </span>
-          ))}
-        </div>
-      </div>
-
-      <div key={step} className={cn("mt-6 sm:mt-10", entrance)}>
-        <div className="flex items-center gap-3">
-          <span aria-hidden className={cn("grid size-11 place-items-center rounded-2xl", tile)}>
-            <Icon className="size-5" />
-          </span>
-          <p className="text-sm font-medium text-muted-foreground">
-            {step === 0 && displayName ? `Welcome, ${displayName}` : eyebrow}
-          </p>
-        </div>
-        <h1
-          ref={heading}
-          tabIndex={-1}
-          className="mt-4 font-display text-4xl font-medium outline-none sm:text-5xl"
-        >
-          {title}
-        </h1>
-        <p className="mt-3 text-base text-muted-foreground sm:text-lg">{intro}</p>
-      </div>
-
-      {/* Every question stays mounted so all the answers are submitted together. */}
-      <div className="mt-6 pb-6 sm:mt-8 sm:pb-10">
-        <div hidden={field !== "householdSize"} className={fieldEntrance}>
-          <HouseholdSizeField initial={household.householdSize} bare />
-        </div>
-        <div hidden={field !== "mealsPerWeek"} className={fieldEntrance}>
-          <MealsPerWeekField initial={household.mealsPerWeek} bare />
-        </div>
-        <div hidden={!preferenceStep}>
-          <FoodPreferencesFields
-            initial={preferences}
-            only={preferenceStep ? field : "eatingStyle"}
-            sectionClassName={fieldEntrance}
-          />
-        </div>
-      </div>
-
-      <div className="sticky bottom-0 -mx-6 mt-auto border-t bg-background/90 px-6 py-4 backdrop-blur-md">
-        {state.error && (
-          <p
-            role="alert"
-            className="mb-4 animate-fade-up rounded-2xl bg-tomato-soft px-4 py-3 text-sm text-tomato-ink"
+            <p className="text-sm font-medium text-muted-foreground">
+              {step === 0 && displayName ? `Welcome, ${displayName}` : eyebrow}
+            </p>
+          </div>
+          <h1
+            ref={heading}
+            tabIndex={-1}
+            className="mt-4 font-display text-4xl font-medium outline-none sm:text-5xl"
           >
-            {state.error}
-          </p>
-        )}
-        {/* The keys keep React from reusing a button across steps: a button
-            that turns into type="submit" mid-click would submit the form. */}
-        <div className="flex items-center justify-between gap-4">
-          {step === 0 ? (
-            <Button
-              key="skip"
-              type="submit"
-              name="intent"
-              value="skip"
-              variant="ghost"
-              className="text-muted-foreground"
-              disabled={pending}
-            >
-              Skip for now
-            </Button>
-          ) : (
-            <Button
-              key="back"
-              type="button"
-              variant="ghost"
-              className="text-muted-foreground"
-              onClick={() => go(step - 1)}
-              disabled={pending}
-            >
-              <ArrowLeft />
-              Back
-            </Button>
-          )}
-          <p className="hidden text-xs text-muted-foreground sm:block">
-            You can change any of this later in Settings.
-          </p>
-          {last ? (
-            <Button key="finish" type="submit" size="lg" disabled={pending}>
-              {pending ? (
-                <Loader2 className="animate-spin" />
-              ) : (
-                <>
-                  Start planning
-                  <ArrowRight />
-                </>
-              )}
-            </Button>
-          ) : (
-            <Button
-              key="continue"
-              type="button"
-              size="lg"
-              onClick={() => go(step + 1)}
-              disabled={pending}
-            >
-              Continue
-              <ArrowRight />
-            </Button>
-          )}
+            {title}
+          </h1>
+          <p className="mt-3 text-base text-muted-foreground sm:text-lg">{intro}</p>
         </div>
-      </div>
-    </form>
+
+        {/* Every question stays mounted so all the answers are submitted together. */}
+        <div className="mt-6 pb-6 sm:mt-8 sm:pb-10">
+          <div hidden={field !== "householdSize"} className={fieldEntrance}>
+            <HouseholdSizeField initial={household.householdSize} bare />
+          </div>
+          <div hidden={field !== "mealsPerWeek"} className={fieldEntrance}>
+            <MealsPerWeekField initial={household.mealsPerWeek} bare />
+          </div>
+          <div hidden={!preferenceStep}>
+            <FoodPreferencesFields
+              initial={preferences}
+              only={preferenceStep ? field : "eatingStyle"}
+              sectionClassName={fieldEntrance}
+            />
+          </div>
+        </div>
+
+        <div className="sticky bottom-0 -mx-6 mt-auto border-t bg-background/90 px-6 py-4 backdrop-blur-md">
+          {state.error && (
+            <p
+              role="alert"
+              className="mb-4 animate-fade-up rounded-2xl bg-tomato-soft px-4 py-3 text-sm text-tomato-ink"
+            >
+              {state.error}
+            </p>
+          )}
+          {/* The keys keep React from reusing a button across steps: a button
+            that turns into type="submit" mid-click would submit the form. */}
+          <div className="flex items-center justify-between gap-4">
+            {step === 0 ? (
+              <Button
+                key="skip"
+                type="submit"
+                name="intent"
+                value="skip"
+                variant="ghost"
+                className="text-muted-foreground"
+                disabled={pending}
+              >
+                Skip for now
+              </Button>
+            ) : (
+              <Button
+                key="back"
+                type="button"
+                variant="ghost"
+                className="text-muted-foreground"
+                onClick={() => go(step - 1)}
+                disabled={pending}
+              >
+                <ArrowLeft />
+                Back
+              </Button>
+            )}
+            <p className="hidden text-xs text-muted-foreground sm:block">
+              You can change any of this later in Settings.
+            </p>
+            {last ? (
+              <Button key="finish" type="submit" size="lg" disabled={pending}>
+                {pending ? (
+                  <Loader2 className="animate-spin" />
+                ) : (
+                  <>
+                    Start planning
+                    <ArrowRight />
+                  </>
+                )}
+              </Button>
+            ) : (
+              <Button
+                key="continue"
+                type="button"
+                size="lg"
+                onClick={() => go(step + 1)}
+                disabled={pending}
+              >
+                Continue
+                <ArrowRight />
+              </Button>
+            )}
+          </div>
+        </div>
+      </form>
+    </>
   );
 }

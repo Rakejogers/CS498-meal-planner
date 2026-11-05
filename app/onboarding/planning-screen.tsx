@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, type CSSProperties, type ReactNode } from "react";
-import { createPortal } from "react-dom";
 import { Logo } from "@/components/logo";
 
 /**
@@ -12,38 +11,50 @@ export function PlanningScreen() {
   const heading = useRef<HTMLHeadingElement>(null);
   useEffect(() => heading.current?.focus({ preventScroll: true }), []);
 
-  return createPortal(
+  return (
     <div
       role="dialog"
       aria-modal="true"
       aria-busy="true"
       aria-labelledby="planning-heading"
-      aria-describedby="planning-note"
-      className="fixed inset-0 z-50 flex animate-fade-up flex-col bg-background [animation-duration:0.3s]"
+      aria-describedby="planning-note planning-time"
+      className="fixed inset-0 z-50 flex flex-col overflow-y-auto bg-background"
     >
-      <header className="mx-auto flex h-16 w-full max-w-3xl items-center px-6">
+      {/* Lined up with the app header, so the logo stays put as the dashboard fades in. */}
+      <header className="mx-auto flex min-h-16 w-full max-w-6xl shrink-0 items-center px-6 py-3">
         <Logo />
       </header>
 
-      <main className="mx-auto flex w-full max-w-xl flex-1 flex-col items-center justify-center px-6 pb-24 text-center">
-        <Basket />
+      <main className="mx-auto flex w-full max-w-xl flex-1 flex-col items-center justify-center px-6 py-8 text-center sm:pb-20">
+        <div className="relative flex h-44 w-64 shrink-0 animate-rise items-end justify-center pb-4 sm:h-56 sm:w-80 sm:pb-6">
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 rounded-full bg-radial from-saffron-soft/70 via-sage-soft/25 to-transparent to-70%"
+          />
+          <Basket />
+        </div>
         <h1
           id="planning-heading"
           ref={heading}
           tabIndex={-1}
-          className="mt-12 animate-rise font-display text-4xl font-medium outline-none [animation-delay:120ms] sm:text-5xl"
+          className="mt-6 animate-rise font-display text-4xl font-medium text-balance outline-none [animation-delay:120ms] sm:text-5xl"
         >
           Planning your week
         </h1>
         <p
           id="planning-note"
-          className="mt-3 animate-rise text-muted-foreground [animation-delay:200ms]"
+          className="mt-3 max-w-xs animate-rise leading-relaxed text-pretty text-muted-foreground [animation-delay:200ms]"
+        >
+          A week of dinners, shaped around your tastes and your table.
+        </p>
+        <p
+          id="planning-time"
+          className="mt-6 animate-rise text-sm text-muted-foreground [animation-delay:280ms]"
         >
           This usually takes less than a minute.
         </p>
       </main>
-    </div>,
-    document.body,
+    </div>
   );
 }
 
@@ -86,7 +97,7 @@ function Ingredient({
 /** The basket the landing page's button turns into, filling and emptying with ingredients. */
 function Basket() {
   return (
-    <svg aria-hidden viewBox="0 0 200 146" className="w-52 animate-rise overflow-visible sm:w-60">
+    <svg aria-hidden viewBox="0 0 200 146" className="relative w-44 overflow-visible sm:w-56">
       <defs>
         {/* Above the rim, or inside the basket: sinking ingredients never poke out below. */}
         <clipPath id="planning-basket-inside">
@@ -103,24 +114,24 @@ function Basket() {
         className="stroke-background [paint-order:stroke]"
         strokeWidth={2}
       >
-        <Ingredient at="translate(40 36) scale(1.1)" order={0} spin={-150}>
+        <Ingredient at="translate(40 36) scale(1.1)" order={0} spin={-18}>
           <path className="fill-sage" d="M14 44C2 31 1 13 8 1c14 7 20 23 14 43Z" />
           <path className="fill-sage" d="M26 44c-2-12 2-22 12-27 3 10-1 21-8 27Z" />
         </Ingredient>
-        <Ingredient at="translate(136 36) rotate(3) scale(1.23)" order={1} spin={130}>
+        <Ingredient at="translate(136 36) rotate(3) scale(1.23)" order={1} spin={14}>
           <g className="fill-saffron">
             <rect x="4" width="18" height="6" rx="3" />
             <rect x="1" y="9" width="24" height="31" rx="6" />
           </g>
         </Ingredient>
-        <Ingredient at="translate(22 34) rotate(-12)" order={2} spin={200}>
+        <Ingredient at="translate(22 34) rotate(-12)" order={2} spin={20}>
           <rect x="1" y="1" width="18" height="62" rx="9" className="fill-saffron-ink" />
           <path
             d="m6 14 8 4M6 25l8 4M6 36l8 4"
             className="fill-none stroke-saffron-soft [stroke-linecap:round]"
           />
         </Ingredient>
-        <Ingredient at="translate(110 34) rotate(12) scale(1.07)" order={3} spin={-170}>
+        <Ingredient at="translate(110 34) rotate(12) scale(1.07)" order={3} spin={-16}>
           <path
             d="M14 12c8 0 12 9 12 20 0 9-5 15-12 15S2 41 2 32c0-11 4-20 12-20Z"
             className="fill-plum"
@@ -130,7 +141,7 @@ function Basket() {
             className="fill-sage-ink"
           />
         </Ingredient>
-        <Ingredient at="translate(74 40) scale(1.33)" order={4} spin={160}>
+        <Ingredient at="translate(74 40) scale(1.33)" order={4} spin={12}>
           <circle cx="15" cy="18" r="12" className="fill-tomato" />
           <path d="m15 10-6-3 4.5-.5L15 2l1.5 4.5L21 7Z" className="fill-sage-ink" />
         </Ingredient>
