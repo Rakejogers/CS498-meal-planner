@@ -1,157 +1,114 @@
-import { z } from "zod";
-import { householdSizeSchema } from "@/lib/household";
+import { AISLES, type Aisle, type Meal, type Unit } from "@/lib/meal-plan";
+import { normalizeFood } from "@/lib/preferences";
 
-const cleanText = (value: string) => value.trim().replace(/\s+/g, " ");
-const ingredientName = z.string().transform(cleanText).pipe(z.string().min(1).max(100));
+// The grocery list: every ingredient from a week's planned meals, with
+// duplicates added up. Pure functions so the math is unit-tested.
 
-export const groceryIngredientsSchema = z
-  .array(
-    z.object({
-      name: ingredientName,
-      quantity: z.number().positive().max(1_000_000).nullable(),
-      unit: z.string().transform(cleanText).pipe(z.string().max(30)),
-    }),
-  )
-  .min(1)
-  .max(50);
-
-export const groceryMealSchema = z.object({
-  title: z.string().transform(cleanText).pipe(z.string().min(1).max(100)),
-  recipeServings: z.coerce.number().int().min(1).max(100),
-  plannedServings: householdSizeSchema,
-  included: z.boolean(),
-  ingredients: groceryIngredientsSchema,
-});
-
-export type GroceryMealInput = z.infer<typeof groceryMealSchema>;
-export type GroceryMeal = GroceryMealInput & { id: string };
-export type GroceryAmount = { quantity: number | null; unit: string };
+export type GroceryAmount = { quantity: number; unit: Unit };
 export type GroceryItem = {
   name: string;
+  /** One amount per kind of measure: weight, volume, or a count of something. */
   amounts: GroceryAmount[];
-  meals: { id: string; title: string }[];
+  /** Where it is in the store, from the first meal that lists it. */
+  aisle: Aisle;
+  /** Which meals need it, as their positions in the plan (0 is the first). */
+  meals: number[];
 };
 
-/** Blank means an unspecified amount; malformed input must never become zero. */
-export function parseQuantity(value: string): number | null | undefined {
-  const text = value.trim();
-  if (!text) return null;
-  if (/^(?:\d+(?:\.\d+)?|\.\d+)$/.test(text)) return Number(text);
-  const fraction = /^(?:(\d+)\s+)?(\d+)\s*\/\s*(\d+)$/.exec(text);
-  if (!fraction || Number(fraction[3]) === 0) return undefined;
-  return Number(fraction[1] ?? 0) + Number(fraction[2]) / Number(fraction[3]);
-}
-
-/** Read parallel ingredient fields without dropping incomplete rows. */
-export function parseGroceryMealForm(form: FormData) {
-  const names = form.getAll("ingredientName");
-  const quantities = form.getAll("quantity");
-  const units = form.getAll("unit");
-  return groceryMealSchema.safeParse({
-    title: form.get("title"),
-    recipeServings: form.get("recipeServings"),
-    plannedServings: form.get("plannedServings"),
-    included:
-      form.get("included") === "true" ? true : form.get("included") === "false" ? false : undefined,
-    ingredients:
-      names.length === quantities.length && names.length === units.length
-        ? names.map((name, index) => ({
-            name,
-            quantity:
-              typeof quantities[index] === "string" ? parseQuantity(quantities[index]) : undefined,
-            unit: units[index],
-          }))
-        : [],
-  });
-}
-
-type Unit = { label: string; family: string; factor: number };
-const units = new Map<string, Unit>();
-function register(label: string, family: string, factor: number, aliases: string[]) {
-  for (const alias of [label, ...aliases]) units.set(alias, { label, family, factor });
-}
-
-register("g", "mass", 1, ["gram", "grams"]);
-register("kg", "mass", 1000, ["kilogram", "kilograms"]);
-register("oz", "mass", 28.349523125, ["ounce", "ounces"]);
-register("lb", "mass", 453.59237, ["lbs", "pound", "pounds"]);
-register("ml", "volume", 1, ["milliliter", "milliliters", "millilitre", "millilitres"]);
-register("l", "volume", 1000, ["liter", "liters", "litre", "litres"]);
-// US customary measures. Never infer a density to convert volume into weight.
-register("tsp", "volume", 4.92892159375, ["teaspoon", "teaspoons"]);
-register("tbsp", "volume", 14.78676478125, ["tablespoon", "tablespoons"]);
-register("cup", "volume", 236.5882365, ["cups"]);
-register("fl oz", "volume", 29.5735295625, ["fluid ounce", "fluid ounces"]);
-register("each", "count", 1, ["", "item", "items"]);
-for (const label of ["can", "clove", "bunch", "package", "slice"]) {
-  register(label, `custom:${label}`, 1, [label === "bunch" ? "bunches" : `${label}s`]);
-}
-
-function normalize(value: string) {
-  return cleanText(value.normalize("NFKC")).toLowerCase();
-}
-
-function resolveUnit(value: string): Unit {
-  const key = normalize(value);
-  return units.get(key) ?? { label: key, family: `custom:${key}`, factor: 1 };
-}
+// Amounts in the same family add up; `factor` converts to the family's base
+// unit (grams or milliliters). Never convert volume into weight: that needs a
+// density per ingredient. Cups and spoons are US measures.
+const UNIT_FAMILIES: Record<Unit, { family: string; factor: number }> = {
+  g: { family: "weight", factor: 1 },
+  kg: { family: "weight", factor: 1000 },
+  oz: { family: "weight", factor: 28.349523125 },
+  lb: { family: "weight", factor: 453.59237 },
+  ml: { family: "volume", factor: 1 },
+  l: { family: "volume", factor: 1000 },
+  tsp: { family: "volume", factor: 4.92892159375 },
+  tbsp: { family: "volume", factor: 14.78676478125 },
+  cup: { family: "volume", factor: 236.5882365 },
+  pinch: { family: "pinch", factor: 1 },
+  each: { family: "each", factor: 1 },
+  clove: { family: "clove", factor: 1 },
+  slice: { family: "slice", factor: 1 },
+  can: { family: "can", factor: 1 },
+  bunch: { family: "bunch", factor: 1 },
+};
 
 /**
- * Shared entry point for manual recipes and future generated meal plans.
- * Ingredient identity is deliberately conservative: case/spacing only, no fuzzy
- * matching (garlic and garlic powder must remain different ingredients).
+ * Combines the ingredients of `meals` into one list, sorted by name. Names
+ * match on case and spacing only, so garlic and garlic powder stay separate.
+ * An amount keeps the unit it was first listed in.
  */
-export function combineGroceries(meals: readonly GroceryMeal[]): GroceryItem[] {
-  const items = new Map<
-    string,
-    { item: GroceryItem; amounts: Map<string, { amount: GroceryAmount; factor: number }> }
-  >();
-  for (const meal of meals) {
-    if (!meal.included) continue;
-    const scale = meal.plannedServings / meal.recipeServings;
+export function combineGroceries(meals: readonly Pick<Meal, "ingredients">[]) {
+  const items = new Map<string, GroceryItem>();
+  meals.forEach((meal, position) => {
     for (const ingredient of meal.ingredients) {
-      const name = normalize(ingredient.name);
-      let entry = items.get(name);
-      if (!entry) {
-        entry = { item: { name, amounts: [], meals: [] }, amounts: new Map() };
-        items.set(name, entry);
+      const name = normalizeFood(ingredient.name);
+      let item = items.get(name);
+      if (!item) {
+        item = { name, amounts: [], aisle: ingredient.aisle, meals: [] };
+        items.set(name, item);
       }
-      if (!entry.item.meals.some(({ id }) => id === meal.id)) {
-        entry.item.meals.push({ id: meal.id, title: meal.title });
-      }
-      const unit = resolveUnit(ingredient.unit);
-      // Keep unmeasured requirements visible even when another recipe has an amount.
-      const key = ingredient.quantity === null ? `unspecified:${unit.label}` : unit.family;
-      const existing = entry.amounts.get(key);
-      if (existing && ingredient.quantity !== null && existing.amount.quantity !== null) {
-        existing.amount.quantity += (ingredient.quantity * scale * unit.factor) / existing.factor;
-      } else if (!existing) {
-        const amount = {
-          quantity: ingredient.quantity === null ? null : ingredient.quantity * scale,
-          unit: unit.label,
-        };
-        entry.item.amounts.push(amount);
-        entry.amounts.set(key, { amount, factor: unit.factor });
-      }
+      if (!item.meals.includes(position)) item.meals.push(position);
+
+      const { family, factor } = UNIT_FAMILIES[ingredient.unit];
+      const same = item.amounts.find((amount) => UNIT_FAMILIES[amount.unit].family === family);
+      if (same) same.quantity += (ingredient.quantity * factor) / UNIT_FAMILIES[same.unit].factor;
+      else item.amounts.push({ quantity: ingredient.quantity, unit: ingredient.unit });
+    }
+  });
+  return [...items.values()].sort((a, b) => a.name.localeCompare(b.name, "en"));
+}
+
+export const AISLE_LABELS: Record<Aisle, string> = {
+  produce: "Produce",
+  "meat-seafood": "Meat & seafood",
+  "dairy-eggs": "Dairy & eggs",
+  bakery: "Bakery",
+  pantry: "Pantry",
+  spices: "Spices & seasonings",
+  frozen: "Frozen",
+  other: "Everything else",
+};
+
+/** `items` split by aisle, in store order. Aisles with nothing on the list are left out. */
+export function groupByAisle(items: readonly GroceryItem[]) {
+  return AISLES.map((aisle) => ({
+    aisle,
+    items: items.filter((item) => item.aisle === aisle),
+  })).filter((group) => group.items.length > 0);
+}
+
+// Units spelled as words read better in the plural: "2 cans", not "2 can".
+const PLURALS: Partial<Record<Unit, string>> = {
+  cup: "cups",
+  clove: "cloves",
+  slice: "slices",
+  can: "cans",
+  bunch: "bunches",
+  pinch: "pinches",
+};
+
+/** "1.5 cups", "200 g", or just "3" for whole items. Rounds for display only. */
+export function formatGroceryAmount({ quantity, unit }: GroceryAmount) {
+  const number = new Intl.NumberFormat(
+    "en-US",
+    quantity < 0.01 ? { maximumSignificantDigits: 2 } : { maximumFractionDigits: 2 },
+  ).format(quantity);
+  if (unit === "each") return number;
+  return `${number} ${number !== "1" && PLURALS[unit] ? PLURALS[unit] : unit}`;
+}
+
+/** The list as plain text by aisle, for copying into a notes app. */
+export function groceryListText(items: readonly GroceryItem[]) {
+  const lines = ["My Plantry grocery list"];
+  for (const group of groupByAisle(items)) {
+    lines.push("", AISLE_LABELS[group.aisle]);
+    for (const item of group.items) {
+      lines.push(`- ${item.name}: ${item.amounts.map(formatGroceryAmount).join(" + ")}`);
     }
   }
-  return [...items.values()]
-    .map(({ item }) => item)
-    .sort((a, b) => a.name.localeCompare(b.name, "en"));
-}
-
-export function formatGroceryAmount({ quantity, unit }: GroceryAmount): string {
-  if (quantity === null) return unit === "each" ? "as needed" : `as needed (${unit})`;
-  const formatted = new Intl.NumberFormat(
-    "en-US",
-    quantity < 0.001 ? { maximumSignificantDigits: 3 } : { maximumFractionDigits: 3 },
-  ).format(quantity);
-  return `${formatted} ${unit}`;
-}
-
-export function groceryListText(items: readonly GroceryItem[]) {
-  return [
-    "My Plantry grocery list",
-    ...items.map((item) => `${item.name}: ${item.amounts.map(formatGroceryAmount).join(" + ")}`),
-  ].join("\n");
+  return lines.join("\n");
 }

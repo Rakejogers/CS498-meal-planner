@@ -24,6 +24,8 @@ export default defineConfig({
     command: isCI ? "npm run start" : "npm run dev",
     url: baseURL,
     reuseExistingServer: !isCI,
+    // No real model in tests (lib/ai/fake-meals.ts). A reused `npm run dev` server won't have this.
+    env: { PLAN_GENERATOR: "fake" },
     timeout: 120_000,
   },
 });

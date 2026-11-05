@@ -10,7 +10,7 @@ This is the foundation everything else builds on:
 
 - Landing page (`/`)
 - Email + password sign up / sign in (`/login`)
-- An empty signed-in page (`/dashboard`) inside the app shell
+- A signed-in dashboard (`/dashboard`) that plans a week of dinners around your household and food preferences
 - Tests at every level (unit, component, database, end-to-end) and CI that runs them on every PR
 
 ## Stack
@@ -115,10 +115,11 @@ Unit tests sit next to the code they test (`lib/auth.test.ts`). [CONTRIBUTING.md
 
 Tables live in `public`. Every table has Row Level Security, and a database test fails if one doesn't.
 
-- `profiles`: one per user (display name), created by a trigger on `auth.users` at sign-up
-- `grocery_meals`: private recipe entries for the current combined grocery list, including original servings, planned servings, ingredient amounts, and whether the meal is included
+- `profiles`: one per user (display name, household size, dinners per week, Kroger store), created by a trigger on `auth.users` at sign-up
+- `food_preferences`: dietary needs, can't-eat, dislikes, and likes
+- `meal_plans` and `planned_meals`: a user's week of dinners, with each recipe's ingredients and steps
 
-The signed-in **Groceries** page is available from the main navigation and dashboard. Add meals and their original recipe amounts; the list scales each recipe to the chosen servings and merges compatible requirements. Meal generation can later reuse the calculation in `lib/groceries.ts`; see [`docs/grocery-list.md`](docs/grocery-list.md).
+The **Groceries** page combines the ingredients of the current week's dinners into one list (`lib/groceries.ts`); see [`docs/grocery-list.md`](docs/grocery-list.md).
 
 **Changing the schema:**
 

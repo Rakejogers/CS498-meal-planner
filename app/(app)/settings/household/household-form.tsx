@@ -2,10 +2,12 @@
 
 import { useActionState, useState } from "react";
 import { HouseholdSizeField } from "@/components/household-size-field";
+import { MealsPerWeekField } from "@/components/meals-per-week-field";
+import type { Household } from "@/lib/household";
 import { SaveBar } from "../save-bar";
 import { saveHousehold, type HouseholdFormState } from "./actions";
 
-export function HouseholdForm({ initial }: { initial: number }) {
+export function HouseholdForm({ initial }: { initial: Household }) {
   const [state, formAction, pending] = useActionState<HouseholdFormState, FormData>(
     saveHousehold,
     {},
@@ -20,7 +22,10 @@ export function HouseholdForm({ initial }: { initial: number }) {
         formAction(formData);
       }}
     >
-      <HouseholdSizeField initial={initial} onChange={() => setEdited(true)} />
+      <div className="space-y-10">
+        <HouseholdSizeField initial={initial.householdSize} onChange={() => setEdited(true)} />
+        <MealsPerWeekField initial={initial.mealsPerWeek} onChange={() => setEdited(true)} />
+      </div>
 
       <SaveBar
         label="Save household"

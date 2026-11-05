@@ -65,4 +65,5 @@ Use the cheapest test that would catch the bug:
 
 - Vitest can't render async Server Components; use Playwright.
 - In Playwright, import `test` from `./fixtures` for a signed-in `user` fixture. Query by role/label, not CSS classes.
+- Playwright starts the app with `PLAN_GENERATOR=fake`, so tests never call the real model. If it reuses your running `npm run dev` server, meal planning tests call the real model and use your `AI_GATEWAY_API_KEY`. Stop the server first to avoid that.
 - Vitest only finds tests in `app/`, `components/`, `lib/`, `scripts/`; Playwright only in `e2e/`. Update the config when adding a source directory.

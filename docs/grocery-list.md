@@ -1,47 +1,21 @@
 # Combined grocery list
 
-User Story 8 has a working manual entry flow at `/groceries`, linked from the dashboard and signed-in navigation. Automatic weekly meal generation and recipe storage are not implemented yet, so this feature does not invent a meal-plan schema or present sample meals as user data.
+User Story 8. `/groceries` shows one list with every ingredient from the dinners in the user's current weekly plan (the same plan the dashboard shows, from `getMealPlan`). Planning new dinners changes the list too. With no plan yet, the page links to the dashboard to plan the week.
 
-## Current flow
+Recipes are already written for the household's serving count when they're generated, so the list adds their amounts as they are, with no scaling.
 
-1. Add a meal, its original serving count, and the original ingredient amounts.
-2. Choose how many people to cook for. Both serving fields initially use the saved household size.
-3. The saved meal is included in the combined list. Edit it, leave it out, or remove it at any time.
-4. Review the ingredient totals and copy the list for shopping.
+Items are grouped by store aisle (`groupByAisle`), in the order a store is usually walked. The model tags each ingredient with an aisle when it plans; plans saved before that read as "Everything else". Each item shows numbered dots for the dinners that use it, matching the numbers on the dashboard's dinner cards.
 
-Entries persist in `public.grocery_meals`. Every read and write checks the signed-in user in `lib/data.ts`, and RLS separately restricts access to the owner. The worksheet represents the current shopping plan; it does not track past weeks. Changing the household default affects new entries; existing meals retain their chosen servings.
-
-## Meal-generation integration
-
-`combineGroceries(meals)` in `lib/groceries.ts` is a pure function with no React or database dependency. A generated recipe can be mapped to the same input:
-
-```ts
-type GroceryMeal = {
-  id: string;
-  title: string;
-  recipeServings: number; // servings the ingredient amounts were written for
-  plannedServings: number;
-  included: boolean; // approved for this shopping plan
-  ingredients: {
-    name: string;
-    quantity: number | null; // null means an unspecified amount
-    unit: string;
-  }[];
-};
-```
-
-Validate generated or imported recipes with `groceryMealSchema` before using the calculator. When the weekly-plan data source is available, adapt its approved recipes in the data layer and reuse `combineGroceries` and the grocery list presentation. The manual worksheet is a separate source, so integrating it should explicitly prevent double-counting the same planned meal.
+Shoppers can tick items off as they go. What's in the basket is kept in the browser's `localStorage`, per plan, so it survives a reload in the store and a new plan starts an empty basket. "Copy list" copies what's left to buy, by aisle.
 
 ## Quantity rules
 
-- Scale each ingredient by `plannedServings / recipeServings`, then add duplicates.
-- Match ingredient names by case and whitespace only. Do not merge different preparations, substitute foods, or guess ingredient synonyms.
-- Convert grams, kilograms, ounces, and pounds by weight; milliliters, liters, US cups, tablespoons, teaspoons, and fluid ounces by volume.
-- Never convert weight into volume without an ingredient-specific density. Show incompatible quantities alongside each other on the same ingredient row.
-- Merge recognized count/package aliases, such as `can` and `cans`. Unknown units merge only when their normalized labels match; can or package sizes are not inferred.
-- Preserve unspecified amounts alongside measured amounts. Decimal, fraction, and mixed-fraction inputs are supported; blank means “as needed.”
-- Keep full calculation precision and round only the displayed amount.
+`combineGroceries(meals)` in `lib/groceries.ts` is a pure function with unit tests.
 
-Pantry availability, product matching, prices, and retailer carts remain separate user stories. The current list contains full recipe requirements and reminds people to check their kitchen.
+- Match ingredient names on case and spacing only. Don't merge different preparations or guess synonyms: garlic and garlic powder stay separate.
+- Add grams, kilograms, ounces, and pounds together by weight; milliliters, liters, US cups, tablespoons, and teaspoons by volume. An amount keeps the unit it was first listed in.
+- Never convert volume into weight; that needs a density per ingredient. Different kinds of amount for the same ingredient show side by side ("1 can + 2").
+- Counts (`each`) and packages (`can`, `clove`, `bunch`, ...) add up only with the same unit.
+- Keep full precision and round only for display.
 
-Validation covers quantity parsing and math in Vitest, ownership and write permissions in pgTAP, and saving/reloading, scaling, exclusion, editing, and removal against real local Supabase in Playwright.
+Amounts are the full recipe totals. Pantry deductions, product matching, prices, and retailer carts are separate user stories.

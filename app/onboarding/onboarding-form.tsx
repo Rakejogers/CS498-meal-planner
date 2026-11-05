@@ -4,6 +4,7 @@ import {
   ArrowLeft,
   ArrowRight,
   Ban,
+  CalendarDays,
   Heart,
   Loader2,
   Salad,
@@ -17,13 +18,15 @@ import {
   type FoodPreferencesSection,
 } from "@/components/food-preferences-fields";
 import { HouseholdSizeField } from "@/components/household-size-field";
+import { MealsPerWeekField } from "@/components/meals-per-week-field";
 import { Button } from "@/components/ui/button";
+import type { Household } from "@/lib/household";
 import type { FoodPreferences } from "@/lib/preferences";
 import { cn } from "@/lib/utils";
 import { completeOnboarding, type OnboardingFormState } from "./actions";
 
 type Step = {
-  field: "householdSize" | FoodPreferencesSection;
+  field: "householdSize" | "mealsPerWeek" | FoodPreferencesSection;
   icon: LucideIcon;
   tile: string;
   eyebrow: string;
@@ -41,6 +44,15 @@ const STEPS: Step[] = [
     title: "Who's at the table?",
     intro:
       "Count everyone who sits down to dinner on a typical night. We'll size recipes and groceries to match.",
+  },
+  {
+    field: "mealsPerWeek",
+    icon: CalendarDays,
+    tile: "bg-sage-soft text-sage-ink",
+    eyebrow: "Your week",
+    title: "How many dinners a week?",
+    intro:
+      "We'll plan this many each week and put everything they need on one grocery list. Leave room for leftovers and nights out.",
   },
   {
     field: "dietaryRestrictions",
@@ -78,11 +90,11 @@ const STEPS: Step[] = [
 
 export function OnboardingForm({
   displayName,
-  householdSize,
+  household,
   preferences,
 }: {
   displayName: string | null;
-  householdSize: number;
+  household: Household;
   preferences: FoodPreferences;
 }) {
   const [state, formAction, pending] = useActionState<OnboardingFormState, FormData>(
@@ -108,6 +120,7 @@ export function OnboardingForm({
 
   const { field, icon: Icon, tile, eyebrow, title, intro } = STEPS[step];
   const last = step === STEPS.length - 1;
+  const preferenceStep = field !== "householdSize" && field !== "mealsPerWeek";
   const entrance =
     direction === "forward"
       ? "animate-step-forward"
@@ -159,12 +172,15 @@ export function OnboardingForm({
       {/* Every question stays mounted so all the answers are submitted together. */}
       <div className="mt-6 pb-6 sm:mt-8 sm:pb-10">
         <div hidden={field !== "householdSize"} className={fieldEntrance}>
-          <HouseholdSizeField initial={householdSize} bare />
+          <HouseholdSizeField initial={household.householdSize} bare />
         </div>
-        <div hidden={field === "householdSize"}>
+        <div hidden={field !== "mealsPerWeek"} className={fieldEntrance}>
+          <MealsPerWeekField initial={household.mealsPerWeek} bare />
+        </div>
+        <div hidden={!preferenceStep}>
           <FoodPreferencesFields
             initial={preferences}
-            only={field === "householdSize" ? "dietaryRestrictions" : field}
+            only={preferenceStep ? field : "dietaryRestrictions"}
             sectionClassName={fieldEntrance}
           />
         </div>

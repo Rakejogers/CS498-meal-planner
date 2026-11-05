@@ -1,6 +1,6 @@
 -- Profiles: sign-up trigger and row level security.
 begin;
-select plan(13);
+select plan(15);
 
 -- Signing up (inserting into auth.users) creates a profile.
 insert into auth.users (id, email, raw_user_meta_data)
@@ -67,6 +67,19 @@ select throws_ok(
   '23514',
   null,
   'a household has at least one person'
+);
+
+select results_eq(
+  $$ update public.profiles set meals_per_week = 6 returning meals_per_week $$,
+  $$ values (6::smallint) $$,
+  'users can set how many dinners they want each week'
+);
+
+select throws_ok(
+  $$ update public.profiles set meals_per_week = 8 $$,
+  '23514',
+  null,
+  'a week has at most seven dinners'
 );
 
 select results_eq(
