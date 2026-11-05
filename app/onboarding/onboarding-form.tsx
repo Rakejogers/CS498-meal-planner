@@ -25,6 +25,7 @@ import type { Household } from "@/lib/household";
 import type { FoodPreferences } from "@/lib/preferences";
 import { cn } from "@/lib/utils";
 import { completeOnboarding, type OnboardingFormState } from "./actions";
+import { PlanningScreen } from "./planning-screen";
 
 type Step = {
   field: "householdSize" | "mealsPerWeek" | FoodPreferencesSection;
@@ -114,6 +115,8 @@ export function OnboardingForm({
   // Null until the user moves, so the first step keeps the page's own entrance.
   const [direction, setDirection] = useState<"forward" | "back" | null>(null);
   const heading = useRef<HTMLHeadingElement>(null);
+  // Whether the last submit was "Start planning" rather than "Skip for now".
+  const [finishing, setFinishing] = useState(false);
 
   // A new step starts at its heading, for keyboards and screen readers too.
   useEffect(() => {
@@ -139,8 +142,22 @@ export function OnboardingForm({
   // The answer follows its question in by a beat.
   const fieldEntrance = cn(entrance, "[animation-delay:70ms]");
 
+  // Finishing saves the answers and plans the first week in one go, which
+  // takes a while; skipping is quick and plans nothing.
+  const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const submitter = (event.nativeEvent as SubmitEvent).submitter;
+    setFinishing(submitter?.getAttribute("value") !== "skip");
+  };
+  const planningShown = pending && finishing;
+
   return (
-    <form action={formAction} className="flex flex-1 flex-col">
+    <form
+      action={formAction}
+      onSubmit={onSubmit}
+      inert={planningShown}
+      className="flex flex-1 flex-col"
+    >
+      {planningShown && <PlanningScreen />}
       <div className="flex items-center gap-4">
         <p className="text-xs font-semibold tracking-widest text-sage-ink uppercase tabular-nums">
           Step {step + 1} of {STEPS.length}
