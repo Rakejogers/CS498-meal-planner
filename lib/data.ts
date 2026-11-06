@@ -1,6 +1,7 @@
 import "server-only";
 import { redirect } from "next/navigation";
 import { cache } from "react";
+import { z } from "zod";
 import { currentWeekStart, savedIngredientsSchema, type Meal } from "@/lib/meal-plan";
 import type { Household } from "@/lib/household";
 import type { KrogerStore } from "@/lib/kroger/stores";
@@ -149,20 +150,65 @@ export const getMealPlan = cache(async (today: string) => {
   return {
     id: data.id,
     weekStart: data.week_start,
-    meals: data.planned_meals.map((meal) => ({
-      id: meal.id,
-      title: meal.title,
-      summary: meal.summary,
-      totalMinutes: meal.total_minutes,
-      servings: meal.servings,
-      // JSON columns: checked against mealSchema before they're saved.
-      ingredients: savedIngredientsSchema.parse(meal.ingredients),
-      steps: meal.steps as string[],
-    })),
+    meals: data.planned_meals.map(toPlannedMeal),
   };
 });
 
 export type MealPlan = NonNullable<Awaited<ReturnType<typeof getMealPlan>>>;
+
+/**
+ * One dinner from the signed-in user's plans, with its full recipe, its place
+ * in the week, and the week it's for. Null when there's no such dinner or it
+ * belongs to someone else.
+ */
+export const getPlannedMeal = cache(async (id: string) => {
+  const user = await requireUser();
+  // Postgres rejects ids that aren't UUIDs with an error, not an empty result.
+  if (!z.guid().safeParse(id).success) return null;
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("planned_meals")
+    .select(
+      "id, position, title, summary, total_minutes, servings, ingredients, steps, meal_plans!inner (week_start, user_id)",
+    )
+    .eq("id", id)
+    .eq("meal_plans.user_id", user.sub)
+    .maybeSingle();
+
+  if (error) throw new Error(error.message);
+  if (!data) return null;
+
+  return {
+    ...toPlannedMeal(data),
+    /** Its place in the week (0 is the first), matching the dinner cards. */
+    position: data.position,
+    weekStart: data.meal_plans.week_start,
+  };
+});
+
+type PlannedMealRow = {
+  id: string;
+  title: string;
+  summary: string;
+  total_minutes: number;
+  servings: number;
+  ingredients: unknown;
+  steps: unknown;
+};
+
+function toPlannedMeal(meal: PlannedMealRow) {
+  return {
+    id: meal.id,
+    title: meal.title,
+    summary: meal.summary,
+    totalMinutes: meal.total_minutes,
+    servings: meal.servings,
+    // JSON columns: checked against mealSchema before they're saved.
+    ingredients: savedIngredientsSchema.parse(meal.ingredients),
+    steps: meal.steps as string[],
+  };
+}
 
 /**
  * Saves the signed-in user's plan for a week, replacing any plan they already
