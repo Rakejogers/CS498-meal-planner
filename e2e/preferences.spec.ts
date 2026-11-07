@@ -35,8 +35,12 @@ test("new users set their household, dinners per week, and food preferences duri
   await page.getByLabel("Foods you love").press("Enter");
   await page.getByRole("button", { name: "Start planning" }).click();
 
-  await expect(page).toHaveURL("/dashboard");
+  // Finishing plans the first week from these answers: three dinners for four.
+  await expect(page).toHaveURL("/dashboard", { timeout: 60_000 });
   await expect(page.getByRole("heading", { name: `Hi ${user.name}.` })).toBeVisible();
+  const dinners = page.getByRole("list", { name: "Dinners this week" }).getByRole("listitem");
+  await expect(dinners).toHaveCount(3);
+  await expect(dinners.first()).toContainText("Serves 4");
 
   // Onboarding only happens once.
   await page.goto("/onboarding");

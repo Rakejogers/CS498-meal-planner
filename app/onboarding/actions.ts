@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { generatePlan } from "@/app/(app)/dashboard/actions";
 import { APP_HOME } from "@/lib/auth";
 import { requireUser, saveFoodPreferences, saveHousehold } from "@/lib/data";
 import { parseHouseholdForm } from "@/lib/household";
@@ -43,6 +44,11 @@ export async function completeOnboarding(
     if (!(await saveFoodPreferences(preferences.data)).ok) return { error: SAVE_FAILED };
   }
   if (!(await markOnboarded()).ok) return { error: SAVE_FAILED };
+
+  // Finishing setup plans the first week, so the dashboard opens on dinners.
+  // This runs after the saves, so it plans from the answers just given. If it
+  // fails, the dashboard still offers "Plan my week".
+  if (formData.get("intent") !== "skip") await generatePlan();
 
   redirect(APP_HOME);
 }

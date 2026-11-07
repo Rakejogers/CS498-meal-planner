@@ -93,6 +93,9 @@
   --animate-tick-down: tick-down 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
   /* A placeholder waiting for content: a faint highlight sweeping slowly across. */
   --animate-shimmer: shimmer 2.4s ease-in-out infinite;
+  /* Planning the first week: an ingredient drops into the basket, sits, then sinks out of
+     sight, on a loop. Stagger with animation-delay; set --drop-spin for how far it turns. */
+  --animate-pack: pack 5.6s linear infinite both;
 
   @keyframes fade-up {
     from {
@@ -236,6 +239,35 @@
     }
   }
 
+  @keyframes pack {
+    from {
+      opacity: 0;
+      transform: translateY(-72px) rotate(var(--drop-spin, 0deg));
+      animation-timing-function: cubic-bezier(0.45, 0, 0.9, 0.6);
+    }
+    4% {
+      opacity: 1;
+    }
+    13% {
+      transform: translateY(2px) rotate(0deg);
+      animation-timing-function: ease-out;
+    }
+    17% {
+      transform: translateY(-2px);
+      animation-timing-function: ease-in-out;
+    }
+    21%,
+    66% {
+      transform: none;
+      animation-timing-function: cubic-bezier(0.5, 0, 0.75, 0);
+    }
+    78%,
+    to {
+      opacity: 1;
+      transform: translateY(100px);
+    }
+  }
+
   @keyframes float {
     0%,
     100% {
@@ -275,6 +307,18 @@
   }
 }
 
+/* Onboarding fading out over the dashboard. It holds for a beat first, so the
+   dashboard's loading skeleton or first blank frame never shows through. */
+::view-transition-old(.onboarding-done) {
+  animation: 0.4s ease-in-out 0.1s both fade-away;
+}
+
+@keyframes fade-away {
+  to {
+    opacity: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   ::after,
@@ -282,5 +326,12 @@
     animation-duration: 0.01ms !important;
     animation-delay: 0s !important;
     animation-iteration-count: 1 !important;
+  }
+
+  /* Its own rule: a browser without view transitions would drop the whole list. */
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
   }
 }
