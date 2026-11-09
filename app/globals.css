@@ -93,6 +93,17 @@
   --animate-tick-down: tick-down 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
   /* A placeholder waiting for content: a faint highlight sweeping slowly across. */
   --animate-shimmer: shimmer 2.4s ease-in-out infinite;
+  /*
+   * Two things stacked in one spot taking turns: swap-a shows first, swap-b takes the second half
+   * of the loop. swap-turn is for an icon that turns each time they trade places.
+   */
+  --animate-swap-a: swap-a 9s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  --animate-swap-b: swap-b 9s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  --animate-swap-turn: swap-turn 9s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  /* A marker crossing its full-width track from left to right, then resting before the next trip. */
+  --animate-travel: travel 7s ease-in-out infinite;
+  /* A column of five values rolling up one row at a time, like a total being added up. */
+  --animate-tally: tally 1.12s cubic-bezier(0.22, 1, 0.36, 1) both;
 
   @keyframes fade-up {
     from {
@@ -233,6 +244,89 @@
     }
     to {
       background-position: -50% 0;
+    }
+  }
+
+  @keyframes swap-a {
+    0%,
+    44%,
+    100% {
+      opacity: 1;
+      transform: none;
+    }
+    50% {
+      opacity: 0;
+      transform: translateY(-60%);
+    }
+    50.01%,
+    94% {
+      opacity: 0;
+      transform: translateY(60%);
+    }
+  }
+
+  @keyframes swap-b {
+    0%,
+    44% {
+      opacity: 0;
+      transform: translateY(60%);
+    }
+    50%,
+    94% {
+      opacity: 1;
+      transform: none;
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(-60%);
+    }
+  }
+
+  @keyframes swap-turn {
+    0%,
+    44% {
+      transform: rotate(0deg);
+    }
+    50%,
+    94% {
+      transform: rotate(180deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes travel {
+    0% {
+      opacity: 0;
+      transform: translateX(0);
+    }
+    6%,
+    54% {
+      opacity: 1;
+    }
+    60%,
+    100% {
+      opacity: 0;
+      transform: translateX(100%);
+    }
+  }
+
+  @keyframes tally {
+    0% {
+      transform: translateY(0);
+    }
+    25% {
+      transform: translateY(-20%);
+    }
+    50% {
+      transform: translateY(-40%);
+    }
+    75% {
+      transform: translateY(-60%);
+    }
+    100% {
+      transform: translateY(-80%);
     }
   }
 
