@@ -56,6 +56,13 @@
   --animate-drop-in: drop-in 0.7s linear var(--drop-delay, 0s) both;
 }
 
+/* A side-by-side layout in a short window, where a full-height panel has to fit on one screen. */
+@custom-variant short {
+  @media (min-width: 64rem) and (max-height: 45rem) {
+    @slot;
+  }
+}
+
 /* Food palette: a soft background and a readable "ink" for each tone. */
 @theme {
   --color-tomato: #e4572e;
@@ -93,6 +100,8 @@
   --animate-tick-down: tick-down 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
   /* A placeholder waiting for content: a faint highlight sweeping slowly across. */
   --animate-shimmer: shimmer 2.4s ease-in-out infinite;
+  /* A thin bar filling left to right: how long a rotating panel stays on one thing. */
+  --animate-fill-x: fill-x 7s linear both;
 
   @keyframes fade-up {
     from {
@@ -224,6 +233,15 @@
     to {
       opacity: 1;
       transform: none;
+    }
+  }
+
+  @keyframes fill-x {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
     }
   }
 

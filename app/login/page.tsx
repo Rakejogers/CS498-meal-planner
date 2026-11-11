@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Logo, LogoMark } from "@/components/logo";
+import { Logo } from "@/components/logo";
 import { cn } from "@/lib/utils";
 import { AuthForm } from "./auth-form";
+import { FeatureShowcase } from "./feature-showcase";
 import { GoogleButton } from "./google-button";
 
 export const metadata: Metadata = {
@@ -109,28 +110,12 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
         </div>
       </div>
 
-      <aside className="relative m-3 hidden overflow-hidden rounded-[2rem] bg-primary lg:flex lg:flex-col lg:justify-center lg:p-14">
-        <div
-          className="pointer-events-none absolute -top-32 -right-32 size-[30rem] animate-drift rounded-full bg-saffron/25 blur-3xl"
-          aria-hidden
-        />
-        <div
-          className="pointer-events-none absolute -bottom-40 -left-20 size-[28rem] rounded-full bg-sage/50 blur-3xl"
-          aria-hidden
-        />
-
-        <div className="relative max-w-md animate-rise [animation-delay:150ms]">
-          <LogoMark variant="badge" className="mb-8 size-20" />
-          <p className="font-display text-5xl leading-[1.05] font-medium text-primary-foreground">
-            What&apos;s for dinner?
-            <br />
-            <em className="font-normal text-saffron italic">Already answered.</em>
-          </p>
-          <p className="mt-5 text-lg text-primary-foreground/70">
-            A whole week of dinners, planned around your kitchen, in the time it takes to preheat
-            the oven.
-          </p>
-        </div>
+      {/* On phones this sits below the form, so the form stays the first thing on screen. */}
+      <aside
+        aria-label="What Plantry does"
+        className="relative m-3 flex flex-col overflow-hidden rounded-[2rem] bg-primary px-6 py-9 sm:px-10 sm:py-12 lg:p-12 xl:p-14 short:p-9!"
+      >
+        <FeatureShowcase />
       </aside>
     </div>
   );
