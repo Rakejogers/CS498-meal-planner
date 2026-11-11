@@ -13,6 +13,10 @@ describe("safeNextPath", () => {
     ["an absolute URL", "https://evil.example"],
     ["a protocol-relative URL", "//evil.example"],
     ["a backslash trick", "/\\evil.example"],
+    // URL parsing deletes tabs and newlines, so these become "//evil.example".
+    ["a tab trick", "/\t/evil.example"],
+    ["a newline trick", "/\n/evil.example"],
+    ["a tab and backslash trick", "/\t\\evil.example"],
     ["a relative path", "dashboard"],
   ])("falls back when next is %s", (_, next) => {
     expect(safeNextPath(next, "/fallback")).toBe("/fallback");
