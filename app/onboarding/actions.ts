@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { generatePlan } from "@/app/(app)/dashboard/actions";
 import { APP_HOME } from "@/lib/auth";
@@ -50,5 +51,7 @@ export async function completeOnboarding(
   // fails, the dashboard still offers "Plan my week".
   if (formData.get("intent") !== "skip") await generatePlan();
 
+  // The browser may still hold app pages that redirected here before setup.
+  revalidatePath("/", "layout");
   redirect(APP_HOME);
 }

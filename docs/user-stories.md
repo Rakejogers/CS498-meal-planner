@@ -16,7 +16,9 @@ As a user, I want to specify how many people I normally cook for so that recipes
 
 ### Acceptance Criteria
 1. Given that I am editing my profile, when I select my household size, then that value is saved as my default serving count.
-2. Given that my household size is saved, when a recipe is added to my weekly plan, then its ingredient quantities should be scaled to the correct number of servings. **TBD WHEN MEAL GENERATION IS IMPLEMENTED**
+2. Given that my household size is saved, when a recipe is added to my weekly plan, then its ingredient quantities should be scaled to the correct number of servings.
+
+**Implemented:** dinners are planned for the saved household size, so each recipe's servings and ingredient quantities are written for that many people.
 
 ## 3. Generate a Weekly Meal Plan - COMPLETED
 **Owner: Ben**
@@ -57,7 +59,7 @@ As a user, I want meal suggestions to consider ingredients that I already have s
 1. Given that I have ingredients marked as available in my pantry, when a weekly meal plan is generated, then those ingredients can be considered when selecting meals.
 2. Given that a meal uses an ingredient I already have, when I view the recipe, then the system should indicate that the ingredient is already available.
 
-## 7. View Recipe Details
+## 7. View Recipe Details - COMPLETED
 **Owner: Jake**
 
 As a user, I want to view the recipe for each planned meal so that I know what ingredients I need and how to prepare the meal.
@@ -66,7 +68,9 @@ As a user, I want to view the recipe for each planned meal so that I know what i
 1. Given that a meal is part of my weekly plan, when I open that meal, then I can see its ingredient list.
 2. Given that I am viewing a recipe, when the recipe loads, then I can see its cooking instructions, serving count, and estimated cooking time.
 
-## 8. Create a Combined Grocery List
+**Implemented:** each dinner card on the dashboard opens `/meals/[id]`, which shows the recipe's ingredients with amounts, numbered steps, servings, and total time.
+
+## 8. Create a Combined Grocery List - COMPLETED
 **Owner: Nate**
 
 As a user, I want ingredients from all of my planned meals combined into one grocery list so that I do not have to manually combine ingredients from several recipes.
