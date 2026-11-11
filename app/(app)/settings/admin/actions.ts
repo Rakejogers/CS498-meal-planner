@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireUser, saveFoodPreferences, saveHousehold } from "@/lib/data";
 import { isDev } from "@/lib/dev";
@@ -40,5 +41,7 @@ export async function restartOnboarding(formData: FormData) {
     .eq("id", user.sub);
   if (error) throw new Error(`Couldn't restart onboarding: ${error.message}`);
 
+  // Drop pages the browser kept, like a deleted plan's recipes.
+  revalidatePath("/", "layout");
   redirect("/onboarding");
 }
