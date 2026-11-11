@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { APP_HOME } from "@/lib/auth";
 import { requireUser, saveFoodPreferences, saveHousehold } from "@/lib/data";
@@ -44,5 +45,7 @@ export async function completeOnboarding(
   }
   if (!(await markOnboarded()).ok) return { error: SAVE_FAILED };
 
+  // The browser may still hold app pages that redirected here before setup.
+  revalidatePath("/", "layout");
   redirect(APP_HOME);
 }

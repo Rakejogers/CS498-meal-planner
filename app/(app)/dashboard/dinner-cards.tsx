@@ -23,8 +23,10 @@ export function Dinners({ meals }: { meals: MealPlan["meals"] }) {
               <MealNumber position={index} />
               <div className="min-w-0">
                 <h2 className="font-display text-xl font-medium wrap-anywhere">
+                  {/* Prefetch the whole recipe so it opens without a loading state. */}
                   <Link
                     href={`/meals/${meal.id}`}
+                    prefetch
                     className="outline-none after:absolute after:inset-0 after:rounded-3xl"
                   >
                     {meal.title}
