@@ -11,10 +11,15 @@ export function isPublicRoute(pathname: string) {
   );
 }
 
+// Stand-in origin for parsing. Only used to check that a path stays on-site.
+const SAME_SITE = "http://same-site.invalid";
+
 /** Only allow same-site relative redirects like "/dashboard". */
 export function safeNextPath(next: string | null | undefined, fallback: string) {
-  if (!next || !next.startsWith("/") || next.startsWith("//") || next.startsWith("/\\")) {
-    return fallback;
-  }
-  return next;
+  if (!next?.startsWith("/")) return fallback;
+  // Parse it the way a browser will. That catches tricks a string check misses,
+  // like "/\t/evil.com", which becomes "//evil.com" once the tab is dropped.
+  const url = URL.parse(next, SAME_SITE);
+  if (url?.origin !== SAME_SITE) return fallback;
+  return url.pathname + url.search + url.hash;
 }
