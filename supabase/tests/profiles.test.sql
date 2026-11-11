@@ -1,12 +1,20 @@
 -- Profiles: sign-up trigger and row level security.
 begin;
-select plan(15);
+select plan(16);
 
 -- Signing up (inserting into auth.users) creates a profile.
 insert into auth.users (id, email, raw_user_meta_data)
 values
   ('11111111-1111-1111-1111-111111111111', 'alice@example.com', '{"display_name": " Alice "}'),
-  ('22222222-2222-2222-2222-222222222222', 'bob@example.com', '{"display_name": "   "}');
+  ('22222222-2222-2222-2222-222222222222', 'bob@example.com', '{"display_name": "   "}'),
+  -- Google sends the full name instead of our display_name.
+  ('44444444-4444-4444-4444-444444444444', 'carol@example.com', '{"full_name": " Carol Ann Smith", "name": "Carol Ann Smith"}');
+
+select is(
+  (select display_name from public.profiles where id = '44444444-4444-4444-4444-444444444444'),
+  'Carol',
+  'a Google sign-up uses the first word of their full name'
+);
 
 select is(
   (select display_name from public.profiles where id = '11111111-1111-1111-1111-111111111111'),

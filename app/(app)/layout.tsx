@@ -7,7 +7,7 @@ import { getProfile } from "@/lib/data";
 
 // Shell for every signed-in page. Add new app pages inside app/(app)/.
 export default async function AppLayout({ children }: LayoutProps<"/">) {
-  const { displayName, email, onboarded } = await getProfile();
+  const { displayName, email, avatarUrl, onboarded } = await getProfile();
   // New accounts go through first-time setup before they see the app.
   if (!onboarded) redirect("/onboarding");
   const name = displayName || email;
@@ -20,7 +20,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
           <AppNav />
 
           <div className="ml-auto">
-            <AccountMenu name={name} email={email} />
+            <AccountMenu name={name} email={email} avatarUrl={avatarUrl} />
           </div>
         </div>
       </header>
