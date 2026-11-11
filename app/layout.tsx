@@ -29,7 +29,12 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${geist.variable} ${fraunces.variable} h-full antialiased`}>
+    <html
+      lang="en"
+      // Smooth for in-page jumps only: the attribute tells Next to switch it off while changing routes.
+      data-scroll-behavior="smooth"
+      className={`${geist.variable} ${fraunces.variable} h-full antialiased motion-safe:scroll-smooth`}
+    >
       <body className="flex min-h-full flex-col">{children}</body>
     </html>
   );
