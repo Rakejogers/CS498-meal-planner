@@ -43,11 +43,13 @@ Setup is in the [README](README.md). Product brief: [`docs/project-overview.md`]
 
 Merging to `main` releases in this order:
 
-1. CI runs lint, unit, database, and end-to-end tests on `main`.
-2. The `Deploy migrations to production` job pushes new migrations to Supabase.
+1. CI runs lint, unit, build, and end-to-end checks on `main`. Database tests and generated-type verification run when `supabase/`, the generated types, dependencies, or CI tooling change. Browser tests still start local Supabase on every run.
+2. The `Deploy migrations to production` job requires both test jobs to pass. It compares migrations and deployment configuration/tooling against a successful ancestor CI run whose database deployment job passed. If they match, it reports success without installing the Supabase CLI or connecting to production. Otherwise it runs `supabase db push`, which applies pending migrations and never seeds production. Missing or unreadable deployment history also triggers a normal push, so a failed earlier migration cannot be bypassed by an app-only merge.
 3. Vercel builds in parallel but holds the deployment until that job passes (Deployment Checks), then puts it live.
 
 If any step fails, the previous version stays live. Fix it with a new PR; don't use Vercel's "Force Promote" unless the failure has nothing to do with the database.
+
+Keep the workflow triggers and the `Deploy migrations to production` check name intact: Vercel needs a result for every main push. Only database steps are conditional. Failed or skipped prerequisite jobs make the deployment check fail explicitly.
 
 ## Testing
 
