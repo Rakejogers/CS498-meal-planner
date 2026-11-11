@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isPublicRoute, safeNextPath } from "./auth";
+import { googleAvatarUrl, isPublicRoute, safeNextPath } from "./auth";
 
 describe("safeNextPath", () => {
   it("keeps same-site paths", () => {
@@ -34,4 +34,27 @@ describe("isPublicRoute", () => {
       expect(isPublicRoute(path)).toBe(false);
     },
   );
+});
+
+describe("googleAvatarUrl", () => {
+  const photo = "https://lh3.googleusercontent.com/a/ACg8ocK=s96-c";
+
+  it("reads Google's photo from avatar_url or picture", () => {
+    expect(googleAvatarUrl({ avatar_url: photo })).toBe(photo);
+    expect(googleAvatarUrl({ picture: photo })).toBe(photo);
+  });
+
+  // Anything else would make next/image throw on every signed-in page.
+  it.each([
+    ["no metadata", undefined],
+    ["an email sign-up", { display_name: "Sam" }],
+    ["another host", { avatar_url: "https://evil.example/a.png" }],
+    ["a look-alike host", { avatar_url: "https://lh3.googleusercontent.com.evil.example/a" }],
+    ["plain http", { avatar_url: "http://lh3.googleusercontent.com/a/x" }],
+    ["a query string", { avatar_url: `${photo}?sz=1` }],
+    ["not a URL", { avatar_url: "lh3.googleusercontent.com/a/x" }],
+    ["not a string", { avatar_url: 42 }],
+  ])("is null for %s", (_, metadata) => {
+    expect(googleAvatarUrl(metadata)).toBeNull();
+  });
 });
