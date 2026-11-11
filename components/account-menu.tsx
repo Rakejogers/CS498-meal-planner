@@ -1,6 +1,7 @@
 "use client";
 
 import { ChevronDown, LogOut, Settings } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
@@ -9,8 +10,19 @@ const ITEM =
   "flex h-10 w-full cursor-pointer items-center gap-2.5 rounded-xl px-3 text-sm font-medium transition-colors outline-none hover:bg-secondary focus-visible:bg-secondary [&_svg]:size-4 [&_svg]:text-muted-foreground";
 
 /** The signed-in header's account button and the menu it opens. */
-export function AccountMenu({ name, email }: { name: string; email: string }) {
+export function AccountMenu({
+  name,
+  email,
+  avatarUrl,
+}: {
+  name: string;
+  email: string;
+  /** Google profile photo; the first letter of their name shows without one. */
+  avatarUrl: string | null;
+}) {
   const [open, setOpen] = useState(false);
+  // Fall back to the initial if Google won't serve the photo.
+  const [avatarFailed, setAvatarFailed] = useState(false);
   const root = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
 
@@ -50,12 +62,23 @@ export function AccountMenu({ name, email }: { name: string; email: string }) {
           open && "border-primary/40 bg-secondary",
         )}
       >
-        <span
-          aria-hidden
-          className="grid size-8 place-items-center rounded-full bg-saffron-soft font-semibold text-saffron-ink uppercase"
-        >
-          {name.charAt(0)}
-        </span>
+        {avatarUrl && !avatarFailed ? (
+          <Image
+            src={avatarUrl}
+            alt=""
+            width={32}
+            height={32}
+            onError={() => setAvatarFailed(true)}
+            className="size-8 rounded-full bg-saffron-soft object-cover"
+          />
+        ) : (
+          <span
+            aria-hidden
+            className="grid size-8 place-items-center rounded-full bg-saffron-soft font-semibold text-saffron-ink uppercase"
+          >
+            {name.charAt(0)}
+          </span>
+        )}
         <span className="hidden max-w-40 truncate sm:block">{name}</span>
         <span className="sr-only">Account menu</span>
         <ChevronDown

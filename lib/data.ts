@@ -5,6 +5,7 @@ import { z } from "zod";
 import { currentWeekStart, savedIngredientsSchema, type Meal } from "@/lib/meal-plan";
 import type { Household } from "@/lib/household";
 import type { KrogerStore } from "@/lib/kroger/stores";
+import { googleAvatarUrl } from "@/lib/auth";
 import { knownRestrictions, type FoodPreferences } from "@/lib/preferences";
 import { createClient } from "@/lib/supabase/server";
 
@@ -48,6 +49,8 @@ export const getProfile = cache(async () => {
   return {
     email: user.email ?? "",
     displayName: data.display_name,
+    /** Their Google profile photo, if they signed in with Google. */
+    avatarUrl: googleAvatarUrl(user.user_metadata),
     /** False until the user finishes (or skips) first-time setup. */
     onboarded: data.onboarded_at !== null,
     /** How many people they cook for: the default serving count for recipes. */
