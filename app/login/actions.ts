@@ -26,6 +26,25 @@ const signUpSchema = z.object({
 
 const field = (formData: FormData, key: string) => String(formData.get(key) ?? "");
 
+const requestOrigin = async () => (await headers()).get("origin") ?? "http://localhost:3000";
+
+export async function signInWithGoogle(
+  _prev: AuthFormState,
+  formData: FormData,
+): Promise<AuthFormState> {
+  const next = safeNextPath(field(formData, "next"), APP_HOME);
+  const supabase = await createClient();
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: `${await requestOrigin()}/auth/callback?next=${encodeURIComponent(next)}`,
+    },
+  });
+  if (error) return { error: "Google sign-in isn't available right now. Try email instead." };
+
+  redirect(data.url);
+}
+
 export async function signIn(_prev: AuthFormState, formData: FormData): Promise<AuthFormState> {
   const email = field(formData, "email").trim();
   const parsed = signInSchema.safeParse({ email, password: field(formData, "password") });
@@ -52,7 +71,7 @@ export async function signUp(_prev: AuthFormState, formData: FormData): Promise<
   const parsed = signUpSchema.safeParse({ name, email, password: field(formData, "password") });
   if (!parsed.success) return { error: parsed.error.issues[0].message, name, email };
 
-  const origin = (await headers()).get("origin") ?? "http://localhost:3000";
+  const origin = await requestOrigin();
   const supabase = await createClient();
   const { data, error } = await supabase.auth.signUp({
     email: parsed.data.email,

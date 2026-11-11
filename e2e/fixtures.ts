@@ -10,7 +10,7 @@ export function newUser(): TestUser {
 
 /** Creates the account and stops at first-time setup, where new users land. */
 export async function createAccount(page: Page, user: TestUser) {
-  await page.goto("/login?mode=signup");
+  await page.goto("/login?mode=signup&method=email");
   await page.getByLabel("First name").fill(user.name);
   await page.getByLabel("Email").fill(user.email);
   await page.getByLabel("Password", { exact: true }).fill(user.password);
@@ -30,7 +30,9 @@ export async function signOut(page: Page) {
   await page.getByRole("button", { name: "Sign out" }).click();
 }
 
+/** Signs in from the default (Google-first) log-in page. */
 export async function signIn(page: Page, user: TestUser) {
+  await page.getByRole("link", { name: "Use email instead" }).click();
   await page.getByLabel("Email").fill(user.email);
   await page.getByLabel("Password", { exact: true }).fill(user.password);
   await page.getByRole("button", { name: "Sign in" }).click();
