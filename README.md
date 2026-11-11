@@ -39,7 +39,7 @@ npx playwright install chromium    # once, for end-to-end tests
 npm run dev                        # http://localhost:3000
 ```
 
-Create an account at [http://localhost:3000/login?mode=signup](http://localhost:3000/login?mode=signup). Local accounts are confirmed instantly.
+Create an account at [http://localhost:3000/login?mode=signup&method=email](http://localhost:3000/login?mode=signup&method=email). Local accounts are confirmed instantly.
 
 **Kroger:** store search and the Kroger login need `KROGER_CLIENT_ID`, `KROGER_CLIENT_SECRET`, and `KROGER_REDIRECT_URI` in `.env.local` (see `.env.example`). Get them from the team's app on [developer.kroger.com](https://developer.kroger.com). The redirect URI must match one registered there exactly. Without them, the rest of the app still works.
 
