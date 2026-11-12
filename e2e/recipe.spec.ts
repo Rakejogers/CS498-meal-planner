@@ -14,7 +14,7 @@ test("a planned dinner opens to its full recipe", async ({ page, user }) => {
   await second.getByRole("link", { name: title }).click();
   await expect(page).toHaveURL(/\/meals\/[0-9a-f-]{36}$/);
   await expect(page.getByRole("heading", { level: 1, name: title })).toBeVisible();
-  await expect(page.getByText("Dinner 2 ·")).toBeVisible();
+  await expect(page.getByRole("article").getByText("Dinner 2 ·")).toBeVisible();
   await expect(page.getByText("Serves 2")).toBeVisible();
   await expect(page.getByText(/^\d+ min$/)).toBeVisible();
   await expect(
