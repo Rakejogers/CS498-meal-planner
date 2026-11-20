@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { MealPlan } from "@/lib/data";
+import { SwapMealButton } from "./swap-meal-button";
 
 const GRID = "mt-8 grid gap-5 md:grid-cols-2";
 
@@ -50,6 +51,9 @@ export function Dinners({ meals }: { meals: MealPlan["meals"] }) {
                 <ShoppingBasket aria-hidden />
                 {meal.ingredients.length} ingredients
               </Badge>
+            </div>
+            <div className="mt-4 flex justify-end">
+              <SwapMealButton mealId={meal.id} mealTitle={meal.title} />
             </div>
           </Card>
         </li>
