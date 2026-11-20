@@ -25,8 +25,8 @@ export function MealsPerWeekField({
   bare = false,
 }: {
   initial: number;
-  /** Called whenever the user changes the answer. */
-  onChange?: () => void;
+  /** Called with the new count whenever the user changes the answer. */
+  onChange?: (count: number) => void;
   /** Hides the question, for a page whose own heading already asks it. */
   bare?: boolean;
 }) {
@@ -39,7 +39,7 @@ export function MealsPerWeekField({
       </legend>
       {!bare && (
         <p className="mt-0.5 mb-4 text-sm text-muted-foreground">
-          Leave room for leftovers and nights out.
+          Count leftover nights too. You&apos;ll choose how many of them you cook.
         </p>
       )}
 
@@ -68,7 +68,7 @@ export function MealsPerWeekField({
                 value={choice}
                 checked={count === choice}
                 onChange={() => {
-                  onChange?.();
+                  onChange?.(choice);
                   setCount(choice);
                 }}
                 className="absolute inset-0 cursor-pointer opacity-0"
@@ -79,7 +79,7 @@ export function MealsPerWeekField({
 
         <p className="mt-5 border-t pt-4 text-sm text-muted-foreground">
           <span className="font-medium text-foreground">{summary(count)}.</span> Each plan will have{" "}
-          {count} {count === 1 ? "dinner" : "dinners"}, and your grocery list covers them all.
+          {count} {count === 1 ? "dinner" : "dinners"}.
         </p>
       </div>
     </fieldset>

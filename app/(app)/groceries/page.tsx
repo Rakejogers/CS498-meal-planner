@@ -3,8 +3,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { getMealPlan } from "@/lib/data";
+import { getMealPlan, getProfile } from "@/lib/data";
 import { combineGroceries } from "@/lib/groceries";
+import { isKrogerConfigured } from "@/lib/kroger/client";
+import { matchGroceries } from "@/lib/kroger/match";
+import { isKrogerConnected } from "@/lib/kroger/session";
 import { formatWeekOf, localDate } from "@/lib/meal-plan";
 import { GroceryList } from "./grocery-list";
 
@@ -13,7 +16,27 @@ export const metadata: Metadata = { title: "Groceries" };
 // Everything the week's dinners call for, in one list. It follows the meal
 // plan, so planning new dinners changes it too.
 export default async function GroceriesPage() {
-  const plan = await getMealPlan(localDate(new Date()));
+  const [plan, { krogerStore }, connected] = await Promise.all([
+    getMealPlan(localDate(new Date())),
+    getProfile(),
+    isKrogerConnected(),
+  ]);
+  const cooked = plan?.meals.filter((meal) => meal.countsForGroceries) ?? [];
+  const dinners = cooked.reduce((sum, meal) => sum + meal.nights, 0);
+  const items = plan ? combineGroceries(plan.meals) : [];
+  const matches =
+    plan && krogerStore && isKrogerConfigured()
+      ? await matchGroceries(
+          items.map((item) => item.name),
+          krogerStore.locationId,
+        ).catch((error: unknown) => {
+          console.error(
+            "Grocery product search failed:",
+            error instanceof Error ? error.message : error,
+          );
+          return items.map((item) => ({ name: item.name, product: null }));
+        })
+      : null;
 
   return (
     <div className="animate-fade-up">
@@ -21,13 +44,16 @@ export default async function GroceriesPage() {
       {plan ? (
         <>
           <p className="mt-3 max-w-xl text-lg text-muted-foreground">
-            Everything for your {plan.meals.length} {plan.meals.length === 1 ? "dinner" : "dinners"}{" "}
-            the week of {formatWeekOf(plan.weekStart)}.
+            {dinners > cooked.length
+              ? `Everything for your ${dinners} dinners, from ${cooked.length} ${cooked.length === 1 ? "cook" : "cooks"}, the week of ${formatWeekOf(plan.weekStart)}.`
+              : `Everything for your ${plan.meals.length} ${plan.meals.length === 1 ? "dinner" : "dinners"} the week of ${formatWeekOf(plan.weekStart)}.`}
           </p>
           <GroceryList
             planId={plan.id}
             meals={plan.meals.map((meal) => meal.title)}
-            items={combineGroceries(plan.meals)}
+            items={items}
+            matches={matches}
+            krogerConnected={connected}
           />
         </>
       ) : (

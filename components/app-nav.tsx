@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarDays, ShoppingBasket } from "lucide-react";
+import { CalendarDays, Refrigerator, ShoppingBasket } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -11,6 +11,7 @@ export function AppNav() {
     <nav aria-label="Main navigation" className="order-3 flex w-full gap-1 sm:order-none sm:w-auto">
       {[
         { href: "/dashboard", label: "Your week", icon: CalendarDays },
+        { href: "/pantry", label: "Pantry", icon: Refrigerator },
         { href: "/groceries", label: "Groceries", icon: ShoppingBasket },
       ].map(({ href, label, icon: Icon }) => (
         <Link

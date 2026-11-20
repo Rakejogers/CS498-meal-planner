@@ -4,7 +4,11 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireUser, saveFoodPreferences, saveHousehold } from "@/lib/data";
 import { isDev } from "@/lib/dev";
-import { DEFAULT_HOUSEHOLD_SIZE, DEFAULT_MEALS_PER_WEEK } from "@/lib/household";
+import {
+  DEFAULT_COOKING_DAYS,
+  DEFAULT_HOUSEHOLD_SIZE,
+  DEFAULT_MEALS_PER_WEEK,
+} from "@/lib/household";
 import { createClient } from "@/lib/supabase/server";
 
 /**
@@ -29,6 +33,7 @@ export async function restartOnboarding(formData: FormData) {
     const reset = await saveHousehold({
       householdSize: DEFAULT_HOUSEHOLD_SIZE,
       mealsPerWeek: DEFAULT_MEALS_PER_WEEK,
+      cookingDays: DEFAULT_COOKING_DAYS,
     });
     // Their meals go with the plans.
     const plans = await supabase.from("meal_plans").delete().eq("user_id", user.sub);

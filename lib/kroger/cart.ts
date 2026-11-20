@@ -5,7 +5,7 @@ import { KROGER_API, KrogerError } from "./client";
 // it can't read the cart or check out. After adding, send the user to
 // KROGER_CART_URL to review and check out on kroger.com.
 
-export const KROGER_CART_URL = "https://www.kroger.com/cart";
+export { KROGER_CART_URL } from "./approval";
 
 export type CartItem = {
   upc: string;

@@ -17,6 +17,11 @@ const request: PlanRequest = {
   dinners: 3,
   householdSize: 2,
   preferences: { dietaryRestrictions: [], cannotEat: ["shellfish"], dislikes: [], likes: [] },
+  pantry: [
+    { name: "tortillas", quantity: 8, unit: "each", expiresOn: "2026-11-20", state: "have" },
+    { name: "coconut milk", quantity: 1, unit: "can", expiresOn: null, state: "have" },
+  ],
+  mealDbCandidates: ["Chicken fajitas", "Chickpea curry"],
 };
 
 const titles = (result: Awaited<ReturnType<typeof planWeek>>) =>
@@ -40,8 +45,34 @@ describe("planWeek", () => {
       expect.objectContaining({
         dinners: 1,
         avoid: ["Tacos", "Curry", "Shrimp scampi"],
+        pantry: [
+          { name: "tortillas", quantity: 7, unit: "each", expiresOn: "2026-11-20", state: "have" },
+          { name: "coconut milk", quantity: 1, unit: "can", expiresOn: null, state: "have" },
+        ],
+        mealDbCandidates: ["Chicken fajitas", "Chickpea curry"],
         // The fill-in shares the week's shopping with the dinners kept.
         shopping: ["tortillas", "chickpeas"],
+      }),
+    );
+  });
+
+  it("holds back a cooking session's leftovers before planning the next one", async () => {
+    const generate = vi
+      .fn<GenerateMeals>()
+      .mockResolvedValueOnce([meal("Tacos", "tortillas")])
+      .mockResolvedValueOnce([meal("Soup", "broth")]);
+
+    const result = await planWeek({ ...request, dinners: 2, nights: [3, 2] }, generate);
+
+    expect(titles(result)).toEqual(["Tacos", "Soup"]);
+    expect(generate).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        dinners: 1,
+        nights: [2],
+        pantry: [
+          { name: "tortillas", quantity: 5, unit: "each", expiresOn: "2026-11-20", state: "have" },
+          { name: "coconut milk", quantity: 1, unit: "can", expiresOn: null, state: "have" },
+        ],
       }),
     );
   });

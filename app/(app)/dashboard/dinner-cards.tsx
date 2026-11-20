@@ -1,5 +1,6 @@
 import { Clock, ShoppingBasket, UsersRound } from "lucide-react";
 import Link from "next/link";
+import { CookedMealButton } from "@/components/cooked-meal-button";
 import { MealNumber } from "@/components/meal-number";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -44,12 +45,15 @@ export function Dinners({ meals }: { meals: MealPlan["meals"] }) {
               </Badge>
               <Badge tone="sky">
                 <UsersRound aria-hidden />
-                Serves {meal.servings}
+                {meal.nights > 1
+                  ? `Feeds ${meal.servings} people for ${meal.nights} dinners`
+                  : `Serves ${meal.servings}`}
               </Badge>
               <Badge tone="sage">
                 <ShoppingBasket aria-hidden />
                 {meal.ingredients.length} ingredients
               </Badge>
+              <CookedMealButton id={meal.id} cooked={meal.cookedAt !== null} />
             </div>
           </Card>
         </li>

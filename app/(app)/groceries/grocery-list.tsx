@@ -25,8 +25,10 @@ import {
   groupByAisle,
   type GroceryItem,
 } from "@/lib/groceries";
+import type { GroceryProductMatch } from "@/lib/kroger/grocery-match";
 import type { Aisle } from "@/lib/meal-plan";
 import { cn, sentenceCase } from "@/lib/utils";
+import { KrogerCart } from "./kroger-cart";
 
 const AISLE_LOOKS: Record<Aisle, { icon: LucideIcon; tile: string }> = {
   produce: { icon: Carrot, tile: "bg-sage-soft text-sage-ink" },
@@ -43,16 +45,25 @@ export function GroceryList({
   planId,
   meals,
   items,
+  matches,
+  krogerConnected,
 }: {
   planId: string;
   /** Titles of the plan's dinners, in order. */
   meals: string[];
   items: GroceryItem[];
+  /** Null until a Kroger store is chosen. Then one match, or none, per ingredient. */
+  matches: GroceryProductMatch[] | null;
+  krogerConnected: boolean;
 }) {
   const [inBasket, setInBasket] = useBasket(planId);
   const [copyStatus, setCopyStatus] = useState("");
   const groups = useMemo(() => groupByAisle(items), [items]);
 
+  const matchByName = useMemo(
+    () => new Map((matches ?? []).map((match) => [match.name, match])),
+    [matches],
+  );
   const done = items.filter((item) => inBasket.has(item.name)).length;
   const left = items.filter((item) => !inBasket.has(item.name));
 
@@ -74,6 +85,7 @@ export function GroceryList({
   return (
     <div className="mt-9 grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_19rem]">
       <aside className="space-y-5 lg:sticky lg:top-24 lg:order-last">
+        <KrogerCart planId={planId} matches={matches} connected={krogerConnected} />
         <Card className="p-6">
           <p className="text-sm font-medium text-muted-foreground">In your basket</p>
           <p className="mt-1 font-display text-4xl font-medium tabular-nums">
@@ -152,6 +164,7 @@ export function GroceryList({
                       item={item}
                       meals={meals}
                       checked={inBasket.has(item.name)}
+                      match={matches ? (matchByName.get(item.name) ?? null) : undefined}
                       onToggle={() => toggle(item.name)}
                     />
                   ))}
@@ -197,11 +210,14 @@ function GroceryRow({
   item,
   meals,
   checked,
+  match,
   onToggle,
 }: {
   item: GroceryItem;
   meals: string[];
   checked: boolean;
+  /** Undefined when product matching wasn't run. Null when nothing matched. */
+  match?: GroceryProductMatch | null;
   onToggle: () => void;
 }) {
   return (
@@ -231,6 +247,15 @@ function GroceryRow({
           >
             {sentenceCase(item.name)}
           </span>
+          {match?.product && (
+            <span className="mt-0.5 block text-xs wrap-anywhere text-muted-foreground">
+              {match.product.name}
+              {match.product.size ? ` · ${match.product.size}` : ""}
+            </span>
+          )}
+          {match && !match.product && (
+            <span className="mt-0.5 block text-xs text-saffron-ink">No product match yet</span>
+          )}
           <span className="mt-1 flex flex-wrap gap-1">
             {item.meals.map((position) => (
               <MealNumber key={position} position={position} size="sm" />

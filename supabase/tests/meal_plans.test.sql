@@ -1,6 +1,6 @@
 -- Meal plans and planned meals: row level security and week rules.
 begin;
-select plan(19);
+select plan(22);
 
 insert into auth.users (id, email)
 values
@@ -87,6 +87,13 @@ select results_eq(
   'users can add meals to their own plan'
 );
 
+select results_eq(
+  $$ update public.planned_meals set cooked_at = '2026-11-20 18:00:00+00'
+     where title = 'Salmon rice bowls' returning title $$,
+  $$ values ('Salmon rice bowls') $$,
+  'users can mark their own dinner as cooked'
+);
+
 select throws_ok(
   $$ insert into public.planned_meals (meal_plan_id, position, title, total_minutes, servings, ingredients, steps)
      values (
@@ -151,6 +158,24 @@ select results_eq(
   'select title from public.planned_meals order by position',
   $$ values ('Tacos'), ('Curry') $$,
   'a failed save keeps the plan that was there'
+);
+
+select lives_ok(
+  $$ select public.save_meal_plan('2026-11-02', '[
+       {"title": "Chili", "summary": "", "total_minutes": 40, "servings": 2, "nights": 3,
+        "counts_for_groceries": true,
+        "ingredients": [{"name": "beans", "quantity": 3, "unit": "can"}], "steps": ["Simmer."]},
+       {"title": "Leftovers: Chili", "summary": "", "total_minutes": 15, "servings": 2,
+        "nights": 1, "counts_for_groceries": false,
+        "ingredients": [{"name": "beans", "quantity": 1, "unit": "can"}], "steps": ["Reheat."]}
+     ]') $$,
+  'a meal-prep plan can mark leftover nights'
+);
+
+select results_eq(
+  $$ select title, nights, counts_for_groceries from public.planned_meals order by position $$,
+  $$ values ('Chili', 3::smallint, true), ('Leftovers: Chili', 1::smallint, false) $$,
+  'leftover nights stay off the grocery list'
 );
 
 select throws_ok(

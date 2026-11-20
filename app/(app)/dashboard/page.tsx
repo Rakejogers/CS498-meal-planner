@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 };
 
 export default async function DashboardPage() {
-  const [{ displayName, mealsPerWeek }, plan] = await Promise.all([
+  const [{ displayName, mealsPerWeek, cookingDays }, plan] = await Promise.all([
     getProfile(),
     getMealPlan(localDate(new Date())),
   ]);
@@ -18,7 +18,7 @@ export default async function DashboardPage() {
       <h1 className="font-display text-4xl font-medium sm:text-5xl">
         Hi {displayName || "there"}.
       </h1>
-      <WeekPlan plan={plan} mealsPerWeek={mealsPerWeek} />
+      <WeekPlan plan={plan} mealsPerWeek={mealsPerWeek} cookingDays={cookingDays} />
     </div>
   );
 }

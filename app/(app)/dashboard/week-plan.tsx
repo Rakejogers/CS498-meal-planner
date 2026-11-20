@@ -13,8 +13,20 @@ import { Dinners, DinnerSkeletons } from "./dinner-cards";
  * The week's dinners and the button that plans them. While a plan is being
  * made, placeholder cards stand in for the dinners on their way.
  */
-export function WeekPlan({ plan, mealsPerWeek }: { plan: MealPlan | null; mealsPerWeek: number }) {
+export function WeekPlan({
+  plan,
+  mealsPerWeek,
+  cookingDays,
+}: {
+  plan: MealPlan | null;
+  mealsPerWeek: number;
+  cookingDays: number;
+}) {
   const [state, formAction, pending] = useActionState<PlanFormState>(generatePlan, {});
+  // Older plans also stored a card per leftover night. The week lists the cooks.
+  const cookedMeals = plan?.meals.filter((meal) => meal.countsForGroceries) ?? [];
+  const coveredDinners = cookedMeals.reduce((sum, meal) => sum + meal.nights, 0);
+  const prepping = plan ? coveredDinners > cookedMeals.length : cookingDays < mealsPerWeek;
 
   const planButton = (
     <form action={formAction}>
@@ -43,7 +55,9 @@ export function WeekPlan({ plan, mealsPerWeek }: { plan: MealPlan | null; mealsP
       {plan ? (
         <div className="mt-3 flex flex-wrap items-center justify-between gap-4">
           <p className="text-lg text-muted-foreground">
-            Your dinners for the week of {formatWeekOf(plan.weekStart)}.
+            {prepping
+              ? `${cookedMeals.length} ${cookedMeals.length === 1 ? "meal" : "meals"}, enough for ${coveredDinners} dinners, the week of ${formatWeekOf(plan.weekStart)}.`
+              : `Your dinners for the week of ${formatWeekOf(plan.weekStart)}.`}
           </p>
           <div className="flex flex-wrap items-center gap-3">
             <Link href="/groceries" className={buttonVariants()}>
@@ -55,8 +69,9 @@ export function WeekPlan({ plan, mealsPerWeek }: { plan: MealPlan | null; mealsP
       ) : (
         <>
           <p className="mt-3 text-lg text-muted-foreground">
-            We&apos;ll pick {mealsPerWeek} {mealsPerWeek === 1 ? "dinner" : "dinners"} around what
-            you like and how many you&apos;re cooking for.
+            {prepping
+              ? `We'll plan ${cookingDays} ${cookingDays === 1 ? "meal" : "meals"}, with enough food for ${mealsPerWeek} dinners.`
+              : `We'll pick ${mealsPerWeek} ${mealsPerWeek === 1 ? "dinner" : "dinners"} around what you like and how many you're cooking for.`}
           </p>
           <div className="mt-8">{planButton}</div>
         </>
@@ -74,10 +89,10 @@ export function WeekPlan({ plan, mealsPerWeek }: { plan: MealPlan | null; mealsP
       {pending ? (
         <>
           <PlanningMessage />
-          <DinnerSkeletons count={mealsPerWeek} />
+          <DinnerSkeletons count={cookingDays} />
         </>
       ) : (
-        plan && <Dinners meals={plan.meals} />
+        plan && <Dinners meals={cookedMeals} />
       )}
     </div>
   );

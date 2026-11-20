@@ -18,7 +18,7 @@ export type GroceryItem = {
 // Amounts in the same family add up; `factor` converts to the family's base
 // unit (grams or milliliters). Never convert volume into weight: that needs a
 // density per ingredient. Cups and spoons are US measures.
-const UNIT_FAMILIES: Record<Unit, { family: string; factor: number }> = {
+export const UNIT_FAMILIES: Record<Unit, { family: string; factor: number }> = {
   g: { family: "weight", factor: 1 },
   kg: { family: "weight", factor: 1000 },
   oz: { family: "weight", factor: 28.349523125 },
@@ -36,14 +36,26 @@ const UNIT_FAMILIES: Record<Unit, { family: string; factor: number }> = {
   bunch: { family: "bunch", factor: 1 },
 };
 
+/** Converts an amount into another unit of the same kind, or null when that needs a density. */
+export function convertQuantity(quantity: number, from: Unit, to: Unit) {
+  const source = UNIT_FAMILIES[from];
+  const target = UNIT_FAMILIES[to];
+  if (source.family !== target.family) return null;
+  return (quantity * source.factor) / target.factor;
+}
+
 /**
  * Combines the ingredients of `meals` into one list, sorted by name. Names
  * match on case and spacing only, so garlic and garlic powder stay separate.
  * An amount keeps the unit it was first listed in.
  */
-export function combineGroceries(meals: readonly Pick<Meal, "ingredients">[]) {
+export function combineGroceries(
+  meals: readonly (Pick<Meal, "ingredients"> & { countsForGroceries?: boolean })[],
+) {
   const items = new Map<string, GroceryItem>();
   meals.forEach((meal, position) => {
+    // Leftover nights repeat a batch that is already on the cook card.
+    if (meal.countsForGroceries === false) return;
     for (const ingredient of meal.ingredients) {
       const name = normalizeFood(ingredient.name);
       let item = items.get(name);

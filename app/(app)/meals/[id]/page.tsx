@@ -2,13 +2,15 @@ import { ArrowLeft, Clock, ShoppingBasket, UsersRound } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { CookedMealButton } from "@/components/cooked-meal-button";
 import { MealNumber } from "@/components/meal-number";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { getPlannedMeal } from "@/lib/data";
+import { getPantryItems, getPlannedMeal } from "@/lib/data";
 import { formatGroceryAmount } from "@/lib/groceries";
 import { formatWeekOf } from "@/lib/meal-plan";
+import { availablePantryNames, isPantryAvailable } from "@/lib/pantry";
 import { cn, sentenceCase } from "@/lib/utils";
 
 export async function generateMetadata({ params }: PageProps<"/meals/[id]">): Promise<Metadata> {
@@ -18,8 +20,10 @@ export async function generateMetadata({ params }: PageProps<"/meals/[id]">): Pr
 
 // One planned dinner's full recipe: what to buy and how to cook it.
 export default async function MealPage({ params }: PageProps<"/meals/[id]">) {
-  const meal = await getPlannedMeal((await params).id);
+  const id = (await params).id;
+  const [meal, pantryItems] = await Promise.all([getPlannedMeal(id), getPantryItems()]);
   if (!meal) notFound();
+  const pantry = new Set(availablePantryNames(pantryItems));
 
   return (
     <article className="animate-fade-up">
@@ -51,26 +55,39 @@ export default async function MealPage({ params }: PageProps<"/meals/[id]">) {
           </Badge>
           <Badge tone="sky">
             <UsersRound aria-hidden />
-            Serves {meal.servings}
+            {meal.nights > 1
+              ? `Feeds ${meal.servings} people for ${meal.nights} dinners`
+              : `Serves ${meal.servings}`}
           </Badge>
           <Badge tone="sage">
             <ShoppingBasket aria-hidden />
             {meal.ingredients.length} ingredients
           </Badge>
+          {meal.nights > 1 && <Badge tone="plum">One cook, eat it again later</Badge>}
+          {meal.countsForGroceries && (
+            <CookedMealButton id={meal.id} cooked={meal.cookedAt !== null} />
+          )}
         </div>
       </header>
 
       <div className="mt-10 grid items-start gap-10 lg:grid-cols-[22rem_minmax(0,1fr)]">
         <section aria-labelledby="ingredients" className="lg:sticky lg:top-24">
           <h2 id="ingredients" className="font-display text-2xl font-medium">
-            Ingredients
+            {meal.nights > 1 ? `Ingredients for all ${meal.nights} dinners` : "Ingredients"}
           </h2>
           <Card className="mt-4 overflow-hidden">
             <ul aria-labelledby="ingredients" className="divide-y">
               {meal.ingredients.map((ingredient, index) => (
                 <li key={index} className="flex items-baseline gap-4 px-5 py-3.5">
-                  <span className="min-w-0 flex-1 font-medium wrap-anywhere">
-                    {sentenceCase(ingredient.name)}
+                  <span className="min-w-0 flex-1">
+                    <span className="flex flex-wrap items-center gap-2">
+                      <span className="font-medium wrap-anywhere">
+                        {sentenceCase(ingredient.name)}
+                      </span>
+                      {isPantryAvailable(ingredient.name, pantry) && (
+                        <Badge tone="sage">In pantry</Badge>
+                      )}
+                    </span>
                   </span>
                   <span className="shrink-0 text-right font-medium text-primary tabular-nums">
                     {formatGroceryAmount(ingredient)}

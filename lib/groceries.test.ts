@@ -36,6 +36,21 @@ describe("combineGroceries", () => {
     expect(oil.amounts[1].quantity).toBeCloseTo(553.59237);
   });
 
+  it("buys a meal-prep batch once and skips the leftover nights", () => {
+    const items = combineGroceries([
+      { ...meal(ingredient("tortillas", 6, "each", "bakery")), countsForGroceries: true },
+      { ...meal(ingredient("tortillas", 2, "each", "bakery")), countsForGroceries: false },
+    ]);
+    expect(items).toEqual([
+      {
+        name: "tortillas",
+        amounts: [{ quantity: 6, unit: "each" }],
+        aisle: "bakery",
+        meals: [0],
+      },
+    ]);
+  });
+
   it("keeps different ingredients and different packages separate", () => {
     const items = combineGroceries([
       meal(

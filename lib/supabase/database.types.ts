@@ -51,16 +51,30 @@ export type Database = {
                   Relationships: [
                     
                   ]
-                },"planned_meals": {
+                },"pantry_items": {
                   Row: {
-                    "created_at": string,"id": string,"ingredients": NonNullable<Json>,"meal_plan_id": string,"position": number,"servings": number,"steps": NonNullable<Json>,"summary": string,"title": string,"total_minutes": number,"updated_at": string
+                    "bought_on": string | null,"created_at": string,"expires_on": string | null,"id": string,"name": string,"opened_on": string | null,"quantity": number,"state": string,"unit": string,"updated_at": string,"user_id": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "created_at"?: string,"id"?: string,"ingredients": NonNullable<Json>,"meal_plan_id": string,"position": number,"servings": number,"steps": NonNullable<Json>,"summary"?: string,"title": string,"total_minutes": number,"updated_at"?: string
+                    "bought_on"?: string | null,"created_at"?: string,"expires_on"?: string | null,"id"?: string,"name": string,"opened_on"?: string | null,"quantity"?: number,"state"?: string,"unit"?: string,"updated_at"?: string,"user_id": string
                   }
                   Update: {
-                    "created_at"?: string,"id"?: string,"ingredients"?: NonNullable<Json>,"meal_plan_id"?: string,"position"?: number,"servings"?: number,"steps"?: NonNullable<Json>,"summary"?: string,"title"?: string,"total_minutes"?: number,"updated_at"?: string
+                    "bought_on"?: string | null,"created_at"?: string,"expires_on"?: string | null,"id"?: string,"name"?: string,"opened_on"?: string | null,"quantity"?: number,"state"?: string,"unit"?: string,"updated_at"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    
+                  ]
+                },"planned_meals": {
+                  Row: {
+                    "cooked_at": string | null,"counts_for_groceries": boolean,"created_at": string,"id": string,"ingredients": NonNullable<Json>,"meal_plan_id": string,"nights": number,"position": number,"servings": number,"steps": NonNullable<Json>,"summary": string,"title": string,"total_minutes": number,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "cooked_at"?: string | null,"counts_for_groceries"?: boolean,"created_at"?: string,"id"?: string,"ingredients": NonNullable<Json>,"meal_plan_id": string,"nights"?: number,"position": number,"servings": number,"steps": NonNullable<Json>,"summary"?: string,"title": string,"total_minutes": number,"updated_at"?: string
+                  }
+                  Update: {
+                    "cooked_at"?: string | null,"counts_for_groceries"?: boolean,"created_at"?: string,"id"?: string,"ingredients"?: NonNullable<Json>,"meal_plan_id"?: string,"nights"?: number,"position"?: number,"servings"?: number,"steps"?: NonNullable<Json>,"summary"?: string,"title"?: string,"total_minutes"?: number,"updated_at"?: string
                   }
                   Relationships: [
                     {
@@ -73,14 +87,14 @@ isOneToOne: false
                   ]
                 },"profiles": {
                   Row: {
-                    "created_at": string,"display_name": string | null,"household_size": number,"id": string,"kroger_location_id": string | null,"kroger_store_address": string | null,"kroger_store_name": string | null,"meals_per_week": number,"onboarded_at": string | null,"updated_at": string
+                    "cooking_days": number,"created_at": string,"display_name": string | null,"household_size": number,"id": string,"kroger_location_id": string | null,"kroger_store_address": string | null,"kroger_store_name": string | null,"meals_per_week": number,"onboarded_at": string | null,"updated_at": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "created_at"?: string,"display_name"?: string | null,"household_size"?: number,"id": string,"kroger_location_id"?: string | null,"kroger_store_address"?: string | null,"kroger_store_name"?: string | null,"meals_per_week"?: number,"onboarded_at"?: string | null,"updated_at"?: string
+                    "cooking_days"?: number,"created_at"?: string,"display_name"?: string | null,"household_size"?: number,"id": string,"kroger_location_id"?: string | null,"kroger_store_address"?: string | null,"kroger_store_name"?: string | null,"meals_per_week"?: number,"onboarded_at"?: string | null,"updated_at"?: string
                   }
                   Update: {
-                    "created_at"?: string,"display_name"?: string | null,"household_size"?: number,"id"?: string,"kroger_location_id"?: string | null,"kroger_store_address"?: string | null,"kroger_store_name"?: string | null,"meals_per_week"?: number,"onboarded_at"?: string | null,"updated_at"?: string
+                    "cooking_days"?: number,"created_at"?: string,"display_name"?: string | null,"household_size"?: number,"id"?: string,"kroger_location_id"?: string | null,"kroger_store_address"?: string | null,"kroger_store_name"?: string | null,"meals_per_week"?: number,"onboarded_at"?: string | null,"updated_at"?: string
                   }
                   Relationships: [
                     

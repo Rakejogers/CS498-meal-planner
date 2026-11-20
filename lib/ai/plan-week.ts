@@ -7,7 +7,10 @@ import {
   UNITS,
   type Meal,
 } from "@/lib/meal-plan";
+import { formatGroceryAmount } from "@/lib/groceries";
+import { pantryForPlanning, remainingPantry, type PantryStock } from "@/lib/pantry";
 import { DIETARY_RESTRICTIONS, type FoodPreferences } from "@/lib/preferences";
+import { scaleMealQuantities } from "@/lib/meal-prep";
 import { fakeMeals } from "./fake-meals";
 
 // Plans dinners through the Vercel AI Gateway. The model picks the meals;
@@ -17,7 +20,17 @@ export type PlanRequest = {
   dinners: number;
   /** Servings for every meal. */
   householdSize: number;
+  /**
+   * Nights each cooking session covers, in order. When a session covers more
+   * than one night, the extra nights are leftovers and the pantry is reduced
+   * by the whole batch.
+   */
+  nights?: number[];
   preferences: FoodPreferences;
+  /** What's still on hand. Listed soonest to expire first, and reduced as dinners are kept. */
+  pantry?: PantryStock[];
+  /** Meal ideas from MealDB that already overlap with pantry ingredients. */
+  mealDbCandidates?: string[];
   /** Meal titles to leave out: ones already planned or being swapped away. */
   avoid?: string[];
   /** Ingredients already on this week's list, to reuse where they fit. */
@@ -36,7 +49,9 @@ const SYSTEM_PROMPT = `You plan a week of dinners for an ordinary home cook: som
 
 What to cook:
 - Plan exactly the number of dinners asked for, each a complete recipe.
+- When the request is for cooking sessions, plan that many recipes, not one per night. Extra nights are leftovers of that cook. Write quantities for one dinner, and choose food that keeps and reheats.
 - Pick familiar, crowd-pleasing dinners that people actually make at home: tacos, stir-fries, pasta, sheet-pan chicken, chili, soups, curries, grain bowls, burgers, frittatas, fried rice. Comfort food beats anything fancy.
+- When MealDB meal ideas are provided, treat them as strong suggestions because they already reuse pantry ingredients. Prefer them unless they clash with the user's needs or would make the week repetitive.
 - Title dishes the way someone would say them at home ("Chicken and broccoli stir-fry", "Turkey chili"), not like a restaurant menu. No foams, reductions, gastriques, or ingredient lists in the title.
 - Every ingredient is something a regular US supermarket stocks. Skip specialty items like saffron, truffle, fresh lemongrass, gochujang, sumac, or exotic cuts of meat.
 - Keep recipes simple: about 10 ingredients or fewer (not counting salt, pepper, and cooking oil), 4 to 7 short steps, and one or two pots or pans. No deep-frying, no from-scratch stock or pasta, no special equipment.
@@ -48,6 +63,9 @@ Shop once, waste little. Plan the week as one shopping list:
 - Use up whole packages across the week: a bunch of cilantro, a bag of spinach, a block of cheddar, a tub of sour cream, a pack of tortillas, a can of coconut milk.
 - A protein can carry two dinners if they taste different, like chicken thighs in tacos early in the week and in fried rice later.
 - Give a shared ingredient the exact same name and unit in every dinner ("yellow onion", "each"), so the grocery list can add them up.
+- When pantry ingredients are available, prefer dinners that use them when it still makes sense for the week.
+- Pantry amounts are what is left. Dinners are planned in order, so a later dinner can use an ingredient only up to the amount still left after earlier dinners.
+- Use ingredients that expire soonest before ones that keep. Do not plan more of a pantry ingredient than the amount listed, and keep that ingredient's name and unit.
 
 Safety and preferences:
 - Never use a food the cook can't eat, including hidden in sauces, stocks, spice blends, or garnishes. Follow every dietary need.
@@ -64,10 +82,45 @@ Format:
 
 const list = (items: string[]) => (items.length ? items.join(", ") : "none");
 
+function formatPantryStock(stock: PantryStock[]) {
+  return pantryForPlanning(stock)
+    .map((item) => {
+      const amount =
+        item.unit === "each" ? `${formatGroceryAmount(item)} each` : formatGroceryAmount(item);
+      const expires = item.expiresOn ? `, expires ${item.expiresOn}` : "";
+      return `- ${item.name}: ${amount}${expires}`;
+    })
+    .join("\n");
+}
+
+function sessionLines(dinners: number, householdSize: number, nights: number[] | undefined) {
+  const plan = Array.from({ length: dinners }, (_, index) => nights?.[index] ?? 1);
+  if (plan.every((count) => count === 1)) {
+    return `Plan ${dinners} ${dinners === 1 ? "dinner" : "dinners"} for ${householdSize} ${householdSize === 1 ? "person" : "people"}.`;
+  }
+  const people = `${householdSize} ${householdSize === 1 ? "person" : "people"}`;
+  return [
+    `Plan ${dinners} cooking ${dinners === 1 ? "session" : "sessions"} for ${people}.`,
+    "Write every recipe for one dinner at that household size. Quantities are for one night only.",
+    ...plan.map((count, index) => {
+      const nightsLabel = count === 1 ? "1 night" : `${count} nights`;
+      const pantryLimit =
+        count > 1
+          ? ` Use at most 1/${count} of each pantry amount, because the leftovers come from this cook.`
+          : "";
+      return `Session ${index + 1}: cooked once, eaten for ${nightsLabel}.${pantryLimit}`;
+    }),
+    "Pick food that keeps and reheats. Do not plan a separate recipe for a leftover night.",
+  ].join("\n");
+}
+
 function describeRequest({
   dinners,
   householdSize,
+  nights,
   preferences,
+  pantry = [],
+  mealDbCandidates = [],
   avoid = [],
   shopping = [],
 }: PlanRequest) {
@@ -77,11 +130,17 @@ function describeRequest({
   ).map((option) => `${option.label} (${option.hint})`);
 
   return [
-    `Plan ${dinners} ${dinners === 1 ? "dinner" : "dinners"} for ${householdSize} ${householdSize === 1 ? "person" : "people"}.`,
+    sessionLines(dinners, householdSize, nights),
     `Dietary needs: ${list(restrictions)}`,
     `Can't eat: ${list(preferences.cannotEat)}`,
     `Dislikes: ${list(preferences.dislikes)}`,
     `Foods they enjoy (inspiration only): ${list(preferences.likes)}`,
+    pantry.length
+      ? `Pantry still on hand, soonest to expire first:\n${formatPantryStock(pantry)}`
+      : "",
+    mealDbCandidates.length
+      ? `Prefer these MealDB meal ideas first because they already match pantry ingredients: ${mealDbCandidates.join("; ")}`
+      : "",
     avoid.length ? `Don't plan any of these again: ${avoid.join("; ")}` : "",
     shopping.length
       ? `These dinners join a week already buying: ${shopping.join(", ")}. Reuse those ingredients where they fit.`
@@ -143,6 +202,12 @@ export async function planWeek(
         dinners: request.dinners - meals.length,
         avoid: [...avoid],
         shopping,
+        // The fill-in dinners can use only what the dinners already kept did not.
+        nights: request.nights?.slice(meals.length),
+        pantry: remainingPantry(
+          request.pantry ?? [],
+          meals.map((meal, index) => scaleMealQuantities(meal, request.nights?.[index] ?? 1)),
+        ).filter((item) => item.quantity > 0),
       }),
     );
   }

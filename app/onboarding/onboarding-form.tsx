@@ -18,6 +18,7 @@ import {
   FoodPreferencesFields,
   type FoodPreferencesSection,
 } from "@/components/food-preferences-fields";
+import { CookingDaysField } from "@/components/cooking-days-field";
 import { HouseholdSizeField } from "@/components/household-size-field";
 import { MealsPerWeekField } from "@/components/meals-per-week-field";
 import { Button } from "@/components/ui/button";
@@ -54,7 +55,7 @@ const STEPS: Step[] = [
     eyebrow: "Your week",
     title: "How many dinners a week?",
     intro:
-      "We'll plan this many each week and put everything they need on one grocery list. Leave room for leftovers and nights out.",
+      "Tell us how many dinners you want to eat, and how many days you actually want to cook. The other nights are leftovers from those cooks.",
   },
   {
     field: "eatingStyle",
@@ -117,6 +118,10 @@ export function OnboardingForm({
   const heading = useRef<HTMLHeadingElement>(null);
   // Whether the last submit was "Start planning" rather than "Skip for now".
   const [finishing, setFinishing] = useState(false);
+  const [mealsPerWeek, setMealsPerWeek] = useState(household.mealsPerWeek);
+  const [cookingDays, setCookingDays] = useState(
+    Math.min(household.cookingDays, household.mealsPerWeek),
+  );
 
   // A new step starts at its heading, for keyboards and screen readers too.
   useEffect(() => {
@@ -203,8 +208,16 @@ export function OnboardingForm({
           <div hidden={field !== "householdSize"} className={fieldEntrance}>
             <HouseholdSizeField initial={household.householdSize} bare />
           </div>
-          <div hidden={field !== "mealsPerWeek"} className={fieldEntrance}>
-            <MealsPerWeekField initial={household.mealsPerWeek} bare />
+          <div hidden={field !== "mealsPerWeek"} className={cn(fieldEntrance, "space-y-8")}>
+            <MealsPerWeekField
+              initial={household.mealsPerWeek}
+              bare
+              onChange={(count) => {
+                setMealsPerWeek(count);
+                setCookingDays((days) => Math.min(days, count));
+              }}
+            />
+            <CookingDaysField count={cookingDays} max={mealsPerWeek} onChange={setCookingDays} />
           </div>
           <div hidden={!preferenceStep}>
             <FoodPreferencesFields
