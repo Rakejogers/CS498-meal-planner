@@ -113,7 +113,7 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
       {/* On phones this sits below the form, so the form stays the first thing on screen. */}
       <aside
         aria-label="What Plantry does"
-        className="relative m-3 flex flex-col overflow-hidden rounded-[2rem] bg-primary px-6 py-9 sm:px-10 sm:py-12 lg:p-12 xl:p-14 short:p-9!"
+        className="relative m-3 flex flex-col overflow-hidden rounded-[2rem] bg-brand px-6 py-9 sm:px-10 sm:py-12 lg:p-12 xl:p-14 short:p-9!"
       >
         <FeatureShowcase />
       </aside>

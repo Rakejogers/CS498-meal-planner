@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* The theme is a class on <html>, set before first paint by THEME_SCRIPT (lib/theme.ts). */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /*
  * Plantry design tokens. Semantic names follow shadcn/ui conventions so
  * components added with `npx shadcn add` pick up the brand automatically.
@@ -23,7 +26,55 @@
   --border: #ebe3d6;
   --input: #e1d8c9;
   --ring: #2f5d3a;
+  /* The forest-green hero panels. Unlike primary, these stay deep green in dark mode. */
+  --brand: #2f5d3a;
+  --brand-foreground: #fbf8f3;
+  --elevation-card: 0 1px 2px rgba(28, 41, 32, 0.04), 0 8px 24px -12px rgba(28, 41, 32, 0.08);
+  --elevation-card-hover:
+    0 2px 4px rgba(28, 41, 32, 0.05), 0 16px 32px -16px rgba(28, 41, 32, 0.18);
+  --elevation-raised: 0 2px 4px rgba(28, 41, 32, 0.05), 0 24px 48px -20px rgba(28, 41, 32, 0.22);
   --radius: 0.875rem;
+}
+
+/* Kitchen at night: warm green-charcoal surfaces, cream text, and softened food tones. */
+.dark {
+  --background: #131a15;
+  --foreground: #ece7dc;
+  --card: #1b241e;
+  --card-foreground: #ece7dc;
+  --popover: #222c25;
+  --popover-foreground: #ece7dc;
+  --primary: #94c79b;
+  --primary-foreground: #12201a;
+  --secondary: #263029;
+  --secondary-foreground: #ece7dc;
+  --muted: #202923;
+  --muted-foreground: #a5aaa0;
+  --accent: #26362b;
+  --accent-foreground: #ece7dc;
+  --destructive: #f0795a;
+  --border: #2a342d;
+  --input: #3a463d;
+  --ring: #94c79b;
+  --brand: #2a5235;
+  --brand-foreground: #fbf8f3;
+  --elevation-card: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px -12px rgba(0, 0, 0, 0.45);
+  --elevation-card-hover: 0 2px 4px rgba(0, 0, 0, 0.35), 0 16px 32px -16px rgba(0, 0, 0, 0.65);
+  --elevation-raised: 0 2px 4px rgba(0, 0, 0, 0.35), 0 24px 48px -20px rgba(0, 0, 0, 0.75);
+
+  --color-tomato-soft: #3b231b;
+  --color-tomato-ink: #f4a68c;
+  --color-saffron-soft: #372b15;
+  --color-saffron-ink: #f0c67a;
+  --color-sage: #74a678;
+  --color-sage-soft: #213125;
+  --color-sage-ink: #a9d4ad;
+  --color-plum: #bd7596;
+  --color-plum-soft: #35222c;
+  --color-plum-ink: #e4b0c8;
+  --color-sky: #649fc6;
+  --color-sky-soft: #1b2e39;
+  --color-sky-ink: #a3cfe9;
 }
 
 @theme inline {
@@ -45,6 +96,12 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-brand: var(--brand);
+  --color-brand-foreground: var(--brand-foreground);
+
+  --shadow-card: var(--elevation-card);
+  --shadow-card-hover: var(--elevation-card-hover);
+  --shadow-raised: var(--elevation-raised);
 
   --font-sans: var(--font-geist-sans);
   --font-display: var(--font-fraunces);
@@ -402,6 +459,10 @@
     color-scheme: light;
   }
 
+  html.dark {
+    color-scheme: dark;
+  }
+
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
@@ -417,6 +478,14 @@
   ::selection {
     background-color: var(--color-saffron-soft);
   }
+}
+
+/* Held while the theme swaps, so the page crossfades as one instead of each control on its own. */
+.theme-changing,
+.theme-changing *,
+.theme-changing ::after,
+.theme-changing ::before {
+  transition: none !important;
 }
 
 /* Onboarding fading out over the dashboard. It holds for a beat first, so the

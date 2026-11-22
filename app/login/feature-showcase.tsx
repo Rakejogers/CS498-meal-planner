@@ -102,8 +102,8 @@ export function FeatureShowcase() {
     <div className="relative mx-auto flex w-full max-w-md flex-1 animate-rise flex-col [animation-delay:150ms] xl:max-w-lg">
       <div aria-hidden className="relative flex flex-1 items-center py-2 lg:py-4">
         {/* A plate under the sketch: the one fixed thing while the steps change. */}
-        <div className="pointer-events-none absolute top-1/2 left-1/2 aspect-square w-[128%] max-w-[34rem] -translate-1/2 rounded-full bg-primary-foreground/[0.035] ring-1 ring-primary-foreground/10">
-          <div className="absolute inset-[12%] rounded-full ring-1 ring-primary-foreground/[0.07]" />
+        <div className="pointer-events-none absolute top-1/2 left-1/2 aspect-square w-[128%] max-w-[34rem] -translate-1/2 rounded-full bg-brand-foreground/[0.035] ring-1 ring-brand-foreground/10">
+          <div className="absolute inset-[12%] rounded-full ring-1 ring-brand-foreground/[0.07]" />
         </div>
         <div className="relative grid w-full xl:[zoom:1.1] short:[zoom:1]!">
           {SCENES.map(({ id, Sketch }, index) => {
@@ -142,10 +142,10 @@ export function FeatureShowcase() {
                 place === "after" && "translate-y-5",
               )}
             >
-              <p className="font-display text-3xl leading-[1.1] font-medium text-balance text-primary-foreground xl:text-4xl">
+              <p className="font-display text-3xl leading-[1.1] font-medium text-balance text-brand-foreground xl:text-4xl">
                 {title}
               </p>
-              <p className="mt-3 max-w-sm leading-relaxed text-primary-foreground/70 short:hidden">
+              <p className="mt-3 max-w-sm leading-relaxed text-brand-foreground/70 short:hidden">
                 {body}
               </p>
             </div>
@@ -162,13 +162,13 @@ export function FeatureShowcase() {
                 aria-current={index === active ? "step" : undefined}
                 onClick={() => dispatch({ type: "go", index })}
                 className={cn(
-                  "block w-full cursor-pointer rounded-md pt-2 pb-1 text-left text-xs font-medium transition-colors outline-none focus-visible:ring-4 focus-visible:ring-primary-foreground/25",
+                  "block w-full cursor-pointer rounded-md pt-2 pb-1 text-left text-xs font-medium transition-colors outline-none focus-visible:ring-4 focus-visible:ring-brand-foreground/25",
                   index === active
-                    ? "text-primary-foreground"
-                    : "text-primary-foreground/50 hover:text-primary-foreground/80",
+                    ? "text-brand-foreground"
+                    : "text-brand-foreground/50 hover:text-brand-foreground/80",
                 )}
               >
-                <span className="block h-0.5 overflow-hidden rounded-full bg-primary-foreground/20">
+                <span className="block h-0.5 overflow-hidden rounded-full bg-brand-foreground/20">
                   {index === active && (
                     // The bar is the timer: when it finishes filling, the next step comes up.
                     // Without motion it has no animation, so the panel stays where it is.
@@ -176,7 +176,7 @@ export function FeatureShowcase() {
                       key={runs[index]}
                       onAnimationEnd={() => dispatch({ type: "next" })}
                       className={cn(
-                        "block h-full origin-left rounded-full bg-primary-foreground/90",
+                        "block h-full origin-left rounded-full bg-brand-foreground/90",
                         playing && "motion-safe:animate-fill-x",
                       )}
                     />
@@ -192,7 +192,7 @@ export function FeatureShowcase() {
           type="button"
           onClick={() => dispatch({ type: "toggle" })}
           aria-label={playing ? "Pause the tour" : "Play the tour"}
-          className="grid size-7 shrink-0 cursor-pointer place-items-center rounded-full text-primary-foreground/60 transition-colors outline-none hover:bg-primary-foreground/10 hover:text-primary-foreground focus-visible:ring-4 focus-visible:ring-primary-foreground/25 motion-reduce:hidden"
+          className="grid size-7 shrink-0 cursor-pointer place-items-center rounded-full text-brand-foreground/60 transition-colors outline-none hover:bg-brand-foreground/10 hover:text-brand-foreground focus-visible:ring-4 focus-visible:ring-brand-foreground/25 motion-reduce:hidden"
         >
           {playing ? (
             <Pause aria-hidden className="size-3.5 fill-current" />

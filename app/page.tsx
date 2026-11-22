@@ -177,7 +177,7 @@ export default async function Home() {
         </div>
 
         <section aria-labelledby="start-heading" className="px-3 pb-3 sm:px-6 sm:pb-6">
-          <Reveal className="relative isolate mx-auto flex max-w-6xl flex-col items-center overflow-hidden rounded-[2.5rem] bg-primary px-6 py-20 text-center text-primary-foreground sm:py-28">
+          <Reveal className="relative isolate mx-auto flex max-w-6xl flex-col items-center overflow-hidden rounded-[2.5rem] bg-brand px-6 py-20 text-center text-brand-foreground sm:py-28">
             <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
               {FLOATING.map(({ Shape, spot, size, delay, drift }) => (
                 <div
@@ -208,7 +208,7 @@ export default async function Home() {
                 href={startHref}
                 className={cn(
                   buttonVariants({ variant: "secondary", size: "lg" }),
-                  "group bg-background text-primary hover:bg-background/90 focus-visible:ring-background/40",
+                  "group bg-brand-foreground text-brand hover:bg-brand-foreground/90 focus-visible:ring-brand-foreground/40",
                 )}
               >
                 {startLabel}

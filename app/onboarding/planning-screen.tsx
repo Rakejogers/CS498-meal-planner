@@ -147,10 +147,10 @@ function Basket() {
         </Ingredient>
       </g>
 
-      <path d={BASKET} className="fill-primary" />
+      <path d={BASKET} className="fill-brand" />
       <path
         d="M18 82h164"
-        className="stroke-primary-foreground/15"
+        className="stroke-brand-foreground/15"
         strokeWidth={2}
         strokeLinecap="round"
       />
