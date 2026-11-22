@@ -60,7 +60,7 @@ export function Wordmark({
         height={724}
         sizes={sizes}
         loading="eager"
-        className="absolute -top-[24.4%] -left-[8.9%] w-[114.4%] max-w-none"
+        className="absolute -top-[24.4%] -left-[8.9%] w-[114.4%] max-w-none dark:brightness-0 dark:invert-[.92] dark:sepia-[.15]"
       />
     </span>
   );

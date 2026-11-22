@@ -18,7 +18,7 @@ export function Dinners({ meals }: { meals: MealPlan["meals"] }) {
         // Keyed by id, so a new plan's cards play their entrance again.
         <li key={meal.id} className="animate-fade-up" style={stagger(index)}>
           {/* The title's link covers the card, so the whole card opens the recipe. */}
-          <Card className="relative flex h-full flex-col p-6 transition-[translate,box-shadow] duration-300 hover:-translate-y-0.5 hover:shadow-[0_2px_4px_rgba(28,41,32,0.05),0_16px_32px_-16px_rgba(28,41,32,0.18)] has-[a:focus-visible]:ring-4 has-[a:focus-visible]:ring-ring/20">
+          <Card className="relative flex h-full flex-col p-6 transition-[translate,box-shadow] duration-300 hover:-translate-y-0.5 hover:shadow-card-hover has-[a:focus-visible]:ring-4 has-[a:focus-visible]:ring-ring/20">
             <div className="flex items-start gap-4">
               <MealNumber position={index} />
               <div className="min-w-0">

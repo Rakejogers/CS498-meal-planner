@@ -10,8 +10,7 @@ export const metadata: Metadata = {
   title: "Admin",
 };
 
-const card =
-  "rounded-3xl border bg-card p-5 shadow-[0_1px_2px_rgba(28,41,32,0.04),0_8px_24px_-12px_rgba(28,41,32,0.08)] sm:p-6";
+const card = "rounded-3xl border bg-card p-5 shadow-card sm:p-6";
 
 // Tools for testing the app locally. Hidden from the tabs and a 404 outside `next dev`.
 export default function AdminSettingsPage() {

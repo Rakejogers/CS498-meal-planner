@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { AccountMenu } from "@/components/account-menu";
 import { AppNav } from "@/components/app-nav";
 import { Logo } from "@/components/logo";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { APP_HOME } from "@/lib/auth";
 import { getProfile } from "@/lib/data";
 
@@ -19,7 +20,8 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
           <Logo href={APP_HOME} />
           <AppNav />
 
-          <div className="ml-auto">
+          <div className="ml-auto flex items-center gap-2">
+            <ThemeToggle />
             <AccountMenu name={name} email={email} avatarUrl={avatarUrl} />
           </div>
         </div>

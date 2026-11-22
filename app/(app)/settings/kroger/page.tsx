@@ -15,8 +15,7 @@ export const metadata: Metadata = {
   title: "Kroger",
 };
 
-const card =
-  "rounded-3xl border bg-card p-5 shadow-[0_1px_2px_rgba(28,41,32,0.04),0_8px_24px_-12px_rgba(28,41,32,0.08)] sm:p-6";
+const card = "rounded-3xl border bg-card p-5 shadow-card sm:p-6";
 
 // What to say after coming back from kroger.com (`?kroger=` on the URL).
 const NOTICES: Record<KrogerConnectStatus, { text: string; tone: "sage" | "neutral" | "tomato" }> =

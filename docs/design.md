@@ -24,7 +24,9 @@ Use color washes sparingly for decorative hero backgrounds. Use solid token colo
 
 ## 3. Color tokens
 
-Hex values below are the light-theme values from `app/globals.css`. Use semantic tokens for common UI roles so the interface remains consistent if the palette changes.
+Hex values below are the light-theme values from `app/globals.css`; the `.dark` block there redefines them. Use semantic tokens for common UI roles so the interface works in both themes. Avoid raw colors and one-off `dark:` overrides.
+
+The theme follows the device setting until someone uses the header toggle. Dark mode is a warm green-charcoal with cream text: `primary` becomes a light sage so it stays readable as text, soft food tones become deep tints, and their inks become light. Use `brand` for forest-green panels that should stay green in both themes, with `brand-foreground` for anything sitting directly on them. Use `shadow-card`, `shadow-card-hover`, and `shadow-raised` for elevation.
 
 ### Neutral and semantic colors
 
@@ -48,6 +50,8 @@ Hex values below are the light-theme values from `app/globals.css`. Use semantic
 | `border`               | `#EBE3D6` | Default borders and separators                                |
 | `input`                | `#E1D8C9` | Form-control borders                                          |
 | `ring`                 | `#2F5D3A` | Keyboard focus ring                                           |
+| `brand`                | `#2F5D3A` | Forest-green hero panels in both themes                       |
+| `brand-foreground`     | `#FBF8F3` | Text and marks directly on brand panels                       |
 
 ### Food palette
 

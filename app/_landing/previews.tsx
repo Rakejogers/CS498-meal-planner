@@ -35,7 +35,7 @@ function Frame({ wash, children }: { wash: string; children: React.ReactNode }) 
       <Card
         className={cn(
           RISE,
-          "relative p-5 shadow-[0_2px_4px_rgba(28,41,32,0.05),0_24px_48px_-20px_rgba(28,41,32,0.22)] transition-[translate] duration-500 ease-out group-hover/reveal:-translate-y-1 motion-reduce:transition-none sm:p-6",
+          "relative p-5 shadow-raised transition-[translate] duration-500 ease-out group-hover/reveal:-translate-y-1 motion-reduce:transition-none sm:p-6",
         )}
       >
         {children}
